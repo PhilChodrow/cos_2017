@@ -14,6 +14,7 @@ Before the first class, please complete the following tasks.
 * We will be learning the R programming language. The classes will be using a program called RStudio to write and run R code. Please go to www.rstudio.com and download RStudio desktop. It should be free. 
 * After going through the installation steps, verify it works correctly by typing 1+2 into the the bottom of the screen in the Console, and click Enter. 
 * Post in Stellar a snapshot of the output of 1+2.
+* Later in the class we will require the most recent version of R (>= 3.3.1). If you already had R installed on your computer, you may have an earlier version. To check and update the R version, follow the steps in pre-lecture-assignment-1.R.
 
 
 ## Task 3 (Windows Users Only): Download Putty
