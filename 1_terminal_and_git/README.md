@@ -45,4 +45,4 @@ Before the first class, please complete the following tasks.
 ** Next to "Password", type your MIT log-in password.
 * Click "Save", and then click "Mount". Open Windows Exporer, and verify that there is a new folder called <your mit id>@'athena.dialup.mit.edu'. Click on it, and there will be some folders in it.
 
-Future assignments will require submitting results on Stellar.
+No results need to be submitted on Stellar for this pre-assignment.
