@@ -1,0 +1,650 @@
+---
+title: "Advanced Topics in Data Science"
+subtitle: "Tidy Modeling To Solve a Small Data Mystery"
+author: "Phil Chodrow"
+date: "January 19th, 2017"
+output: 
+  # tufte_handout:
+    # highlight: tango
+  # html_document:
+  #   theme: journal
+  tufte::tufte_html:
+    keep_md: true
+    # highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+```
+
+# Introduction
+
+At this stage in your `R` training, you've covered quite a lot of ground. You know the basics of:
+
+- Reading your data;
+- Cleaning your data;
+- Exploring your data with summary statistics and visualizations;
+- Engineering new features that capture meaningful signal in your data
+- Modeling your data and evaluating the models. 
+
+In today's session, we'll synthesize and build on some of these skills by identifying a cause of an odd spike in AirBnB rental prices.  We'll practice our data manipulation and visualization skills, perform some very basic time-series analysis, and learn to think about data analysis as a process of stripping away different layers of signal in your data. Throughout our discussion, the focus will be on using the "tidy" tools `dplyr`, `tidyr`, and `ggplot2` you learned in Session 2 in the context of an advanced data investigation task that incorporates modeling, complex feature engineering, and visualization. 
+
+In terms of software tools in `R`, we'll: 
+
+1. Review elementary data reading and preparation.
+2. Review some basic plotting with `ggplot2`.
+3. Fit many models at once using `tidyr`, `dplyr` and a bit of help from functional programming tools.
+4. Use grouped `mutate` to efficiently construct complex columns. 
+5. Do some elementary geographic visualization with `ggmap`.
+
+# Before the Session
+
+You need to ensure that the `tidyverse` packages is installed. You will also need the `ggmap` package: 
+
+```{r, eval = FALSE}
+install.packages('tidyverse')
+install.packages('ggmap')
+```
+
+You should already have installed these tools in Sessions 2 and 3, so if you have attended those sessions and successfully run the code, you don't need to do anything else. 
+
+Let's get started! 
+
+# Setup
+
+## Load Packages
+```{r, message=FALSE}
+library(tidyverse)
+library(broom)
+library(ggmap)
+library(lubridate)
+library(stringr)
+```
+
+## Read the Data
+
+For today's exploration, we'll need the `calendar` and `listing` data sets. 
+```{r}
+calendar <- read_csv('data/calendar.csv')
+listings <- read_csv('data/listings.csv')
+```
+
+
+## Data Preparation
+
+We're going to be studying temporal trends in AirBnB prices today, so our first step will be to generate the appropriate set of features. To account for the fact that some rentals are larger than others, our main feature will be the  *listed price per person over time.* To capture the temporal aspect, we'll base our data set on the `calendar` data, but we'll need to grab the `accommodates` column from `listings`:
+
+```{r}
+prices <- calendar %>% 
+	left_join(listings, by = c('listing_id' = 'id' )) %>% 
+	select(listing_id, date, price = price.x, accommodates)
+
+prices %>% head(5)
+```
+
+Looks good. Next, let's construct the `price_per` column. First, we'll need to convert the `price` column into a number:  
+
+```{r}
+prices <- prices %>% 
+	mutate(price = as.numeric(sub("\\$|","", price)),
+		   price_per = price / accommodates) %>% 
+	select(listing_id, date, price_per) 
+prices %>% head(5)
+```
+
+## Last bit of data preparation
+
+Now let's do a bit of cleaning. In order, we're going to: 
+
+- Remove rows with `NA` in any entries. 
+- Remove rows corresponding to listings that have less than 200 days of data
+- Change the date to a format that will be more workable for later modeling. 
+
+```{r}
+prices <- prices %>% 
+	mutate(date = as.numeric(date),
+		   listing_id = as.character(listing_id)) %>% 
+	na.omit() %>% 
+	group_by(listing_id) %>% 
+	filter(n() >= 200) 
+```
+
+
+# Preliminary Explorations
+
+Let's take a quick look at what we have. First, we'll visualize a few sample time series.^[The `head` function takes only the first 2000 rows of data, which prevents overplotting.]   
+
+```{r, fig.margin = T, fig.cap = "Sample time series."}
+prices %>% 
+	head(2000) %>% 
+	ggplot() + 
+	aes(x = date, 
+		y = price_per, 
+		group = listing_id) +
+	geom_line() + 
+	facet_wrap(~listing_id, 
+			   ncol = 1, 
+			   scales = 'free_y') +
+	theme(strip.text.x = element_blank())
+```
+
+Looks like there's a lot of variety: some prices are simply constant; others vary periodically; and others still have specific upticks at certain times of day. We can get "the big picture" by plotting the average over time: 
+
+```{r fig.margin = T, fig.cap = "Average over time."}
+mean_plot <- prices %>% 
+	group_by(date) %>% 
+	summarise(mean_pp = mean(price_per, na.rm = T)) %>% 
+	ggplot() + 
+	aes(x = date, y = mean_pp) +
+	geom_line() 
+mean_plot 
+```
+
+While inspecting means isn't usually enough to give you the full picture, it can help get you oriented. Just from the mean series	, we can observe at least three phenomena: 
+
+1. Long-term (seasonal?) variation, reflected by the "overal shape" of the chart.
+2. Periodic oscillation -- on average, weekends are more expensive than weekdays. 
+3. A prominent spike around time 17300, which happens to fall in April. 
+
+We can think of each of these phenomena as a "signal" -- something interesting that the data may be trying to tell us. The remainder of our time together will focus on *isolating* these different components, to study them separately. We'll do this by peeling back layers: first identifying and subtracting the long-term trend; then identifying and subtracting the periodic oscillation; and finally studying the spike itself in relative isolation. Of course, data is messy and we won't be able to carry out this program perfectly. As we'll see, though, once we're done, we'll be able to "see" the reason for the spike in an intuitive way. 
+
+# Capturing Long-Term Trend
+
+We'd like to begin modeling our data by fitting a function that captures the long-term trend. There's considerable diversity in the different listings, and we shouldn't expect a single model to accurately model each series. We'd therefore like to construct a model *for each series*. 
+
+So, we have two questions: 
+
+1. What model should we use? 
+2. How should we fit a model per series? 
+
+**Model choice:** there are lots of good answers in the theory of time-series analysis.^[The simplest non-parameteric model is to take a moving average, but auto-regressive models give parameteric representations] Since you now have some background in machine learning, we'll use a simple non-parameteric regression smoother, called "LOcal regrESSion," usually abbreviated to "LOESS." We can easily visualize a LOESS model, since it's `ggplot2`'s default for `geom_smooth()`: 
+
+```{r fig.margin = T, fig.cap = "Average over time with a LOESS smoother."}
+mean_plot + 
+	geom_smooth() 
+```
+
+Apparently, the LOESS model captures the overall seasonality quite nicely. It won't look quite this clean on individual level data, as we'll see in a moment. 
+
+**Fitting many models:** We have `r dplyr::n_distinct(prices$listing_id)` distinct series to model. How should we proceed? One approach is a for-loop, but `R` hates those. There are plenty of alternatives,^[Such as using the `by()` function, or manually writing a complex function that can be used in in a `mutate` call.] but we'll use a particularly elegant method that uses tools you already learned in Session 2. It starts by doing something quite strange.  
+
+## Data Frames of Data Frames... 
+
+Our key tool is the function `tidyr::nest()`:^[the argument `-listing_id`  tells `nest` not to fold in the `listing_id`, but to construct a separate data frame for each one. `nest(-listing_id)` is a lot like `group_by(listing_id)`, but instead of a group of rows for each id, you have a single row containing a data frame.] 
+
+```{r, fig.margin = T}
+prices_nested <- prices %>% 
+	nest(-listing_id)
+```
+
+The function `nest` converts our perfectly well-behaved data frame into something funky: a data frame of data frames:^[The output below states that the contents of the second column have class `tibble`. A `tibble` is a slightly gussied up version of a `data.frame`, and I'll just refer to them as "data frames" from here on out.]
+
+```{r}
+prices_nested %>% head(5)
+```
+
+By inspecting an element of the `data` column, we can confirm it's a data frame:
+
+```{r, fig.margin = T}
+prices_nested$data[[1]] %>% head(5)
+```
+
+Ok, why on earth would we want this? Any ideas? 
+
+The key point is that we can use knowledge you already have to fit our models. Specifically,
+
+> We can now `mutate` with functions whose arguments are data frames.  
+
+This probably isn't clear yet, but we'll see this become quite powerful. 
+
+**Recall** that a `mutate` call looks like this: 
+
+```{r, eval = F}
+data %>%
+	mutate(new_col = some_function(existing_col))
+```
+
+Since we have a column containing *data*, we can use `mutate` to construct a new column of *models* -- all we need to do is write a simple function that constructs a LOESS model from data. We haven't discussed writing functions yet, but the idea is simple: 
+
+```{r}
+my_loess <- function(data, span){
+	loess(price_per ~ date,  
+		  data = data, 
+		  na.action = na.exclude, 
+		  span = span)
+}
+```
+
+In words,
+
+> `my_loess` now refers to a function whose arguments are `data` and `span`. The action of `my_loess` is to return a `loess` object, using `data` and `span` as arguments. 
+
+With that done, we are ready to fit `r nrow(prices_nested)` models with one simple call to `mutate`. We can even specify the "span" of the model manually. However, the most direct approach won't work:
+
+```{r, error=T}
+prices_with_models <- prices_nested %>% 
+	mutate(model = my_loess(data, span = .5))
+```
+
+The wrinkle is that we need to use `purrr::map` to *vectorize* the function `my_loess`.^[The `purrr` package is a useful package, also by Hadley Wickham, for easy *functional programming* in `R`. Vectorization is one of the key concepts of functional programming.] A *vectorized* function acts on an entire column of a data frame at once; `dplyr::mutate` requires that all functions it uses be vectorized. Almost all the basic functions you know, like `sum()`, `mean()`, `paste`, etc. are vectorized, so this problem may not have come up yet. 
+
+Other than the manual vectorization with `purrr::map`, our model fitting now looks like any other `mutate` call: 
+
+```{r}
+prices_with_models <- prices_nested %>% 
+	mutate(model = map(data, my_loess, span = .25))
+
+```
+
+Ok, so what does the `model` column of `prices_with_models` now contain?
+
+```{r}
+prices_with_models %>% head(5)
+```
+
+Just like there are data frames in the `data` column, there are now statistical models in the `model` column. Let's take a closer look: 
+
+```{r, fig.margin = T}
+summary(prices_with_models$model[[1]])
+```
+
+Yup, looks like a model! But just having the model itself isn't so interesting -- we'd like to compare the data to the model predictions and inspect the model residuals. We can add a new column that contains all this information using the `broom::augment` function.^[The `broom` package "tidies" model outputs by converting them into data frames. This allows us to do complex modeling tasks without leaving our standard `dplyr` pipelines.] Just like before, we need to vectorize with `purrr::map`: 
+
+```{r}
+prices_with_preds <- prices_with_models %>% 
+	mutate(preds = map(model, augment))
+```
+
+What does the result look like? 
+
+```{r}
+prices_with_preds$preds[[1]] %>% tbl_df() %>% head(5)
+```
+
+Each entry in the column `preds` contains the original data (`price_per` and `date`), as well as the `.fitted` predictions, the standard error `.se.fit` associated with the model prediction, and the model residual `.resid`, which is simply the difference between `price_per` and `.fitted`. 
+As always in statistics, the residuals are extremely important. We can think of them as *data minus current signal*: they are what the data still has to tell us after we've extracted the seasonal trend signals. 
+
+## Back to Sanity
+
+Ok, let's get out of this crazy data frames of data frames business.^[`unnest` is the inverse of `nest`; its argument says which column of data frames you wish to access.] 
+
+We'll also convert the date back into a more human-readable format: 
+
+```{r}
+prices_modeled <- prices_with_preds %>% 
+	unnest(preds) %>% 
+	mutate(date = as.Date.numeric(date, 
+								  origin = "1970-01-01"))
+prices_modeled %>% head(5)
+```
+
+Notice what's happened: we now have a single data frame with no nested structure. We also have our `listing_id` column back, as well as the original data and the model predictions. This means that we're ready to start visualizing the fit and evaluating its quality. Let's take a look! 
+
+```{r, fig.margin = T, fig.cap = 'Example series with trend models.'}
+prices_modeled %>%
+	head(2000) %>% 
+	ggplot(aes(x = date, group = listing_id)) +
+	geom_line(aes(y = price_per)) +
+	geom_line(aes(y = .fitted), color = 'red') +
+	facet_wrap(~listing_id, ncol = 1, scales = 'free_y') + 
+	theme(strip.text.x = element_blank())
+```
+
+As we can see, the `LOESS` smoother is far from a perfect model for the data -- there's more signal left to capture. For now, let's name the part of the signal that we have captured to reflect the fact that it captures the long-term trend:
+
+```{r}
+prices_modeled <- prices_modeled %>%
+	rename(trend = .fitted)
+```
+
+## Summing Up: Nested Models
+
+To wrap things up so far, what did we do to capture the long-term trend? We:
+
+1. **Nested** our data into a data frame of data frames. 
+2. We wrote a simple **modeling** function, whose main feature was that it took a data frame as an argument. 
+3. We **mapped** that function onto each of of our little data frames, thereby fitting many models at once. 
+4. We **augmented** our data frame to extract the model predictions and residuals in tidy format. 
+5. We **unnested** our data so that we could continue to explore and visualize our data. 
+
+It's important to emphasize that the key steps here -- model, map, augment -- are highly general, and work with many machine learning models, not just `LOESS`. Linear and non-linear regression models, k-means, and singular-value decompositions are just a few of the many models for which the same approach will work smoothly. 
+
+In summary, 
+
+> When you need to fit a model to each group of a data frame, consider using `tidyr::nest`, `purrr::map`, and `broom::augment`. 
+
+Why? Because it's easy to write. Our complete pipeline for fitting `r nrow(prices_nested)` LOESS models to our data is:
+
+```{r, eval = FALSE}
+
+my_loess <- function(data, span){
+	loess(price_per ~ date,  
+		  data = data, 
+		  na.action = na.exclude, 
+		  span = span)
+}
+
+prices %>% 
+	nest(-listing_id) %>% 
+	mutate(model = map(data, my_loess, span = .5),
+		   preds = map(model, augment)) %>% 
+	unnest(preds)
+
+```
+
+Not bad for a trivial function definition and four lines of code! Clever use of nesting can save you a lot of writing time and a lot of headaches. 
+
+# Computing Periodicity
+
+There are plenty of systematic tools in `R` for computing the periodicity of a time series.^[See, for example, `forecast::findfrequency`.] However, we have the benefit of knowing the frequency already -- by inspection, it's the seven-day week. We can easily construct the periodic trend using `dplyr` with a little help from `lubridate`, which makes it easy to work with dates in `R`. First, we'll figure out which day of the week it is, with a little help from `lubridate`.^[`lubridate` is a package for working with dates and times. It fits neatly into the tidy data format]. 
+
+```{r}
+prices_modeled <- prices_modeled %>% 
+	mutate(weekday = wday(date, label = T)) 
+
+prices_modeled$weekday[1:5]
+```
+
+Now that we have a weekday column, we should compute the average per weekday for each listing. But we don't want to *summarise* our data down into a smaller data frame -- we want the periodic component to simply be another column, that we can compare with our original data directly. The key is to use `group_by() %>% mutate()`. You've already seen `group_by() %>% summarise()` -- the only difference is that, instead of reducing our data, when we construct the new column each computation will take place "within group".^[Note that we are averaging the *residual*, not the original data -- since we've already captured part of the signal in the `trend` column. ]
+
+```{r}
+prices_modeled <- prices_modeled %>% 
+	group_by(listing_id, weekday) %>% 
+	mutate(periodic = mean(.resid, na.rm = T)) %>%
+	ungroup() %>% 
+	arrange(listing_id, date)
+```
+
+Let's take a look at our new column:
+```{r}
+prices_modeled %>% select(date, weekday, .resid, periodic)
+```
+
+Just as we'd expect: though the `.resid` column differs between weekdays, the `periodic` column does not. 
+
+Now we've extracted two kinds of signal from the original data, the `trend` and the `periodic` signals. We can complete our decomposition by constructing a final column, called `remainder`, that's not captured by the trend signal or the periodic signal:
+
+```{r}
+prices_modeled <- prices_modeled %>% 
+	mutate(remainder = .resid - periodic)
+```
+
+Let's visualize this decomposition. We want to visualize four series together:
+
+- The original data, `price_per`
+- The seasonal trend, `trend`
+- The periodic oscillation, `periodic`
+- The remaining signal, `remainder`
+
+This is a good exercise in using `tidyr::gather`:
+
+```{r, fig.margin = T, fig.cap = "Sample decompositions"}
+
+prices_modeled %>% 
+	head(1500) %>% 
+	select(-.se.fit, -.resid, -weekday) %>% 
+	gather(metric, value, -listing_id, -date) %>% 
+	mutate(metric = factor(metric, c('price_per', 
+									 'trend', 
+									 'periodic', 
+									 'remainder'))) %>% 
+	ggplot() + 
+	aes(x = date, 
+		y = value, 
+		group = listing_id, 
+		color = listing_id) + 
+	geom_line() + 
+	facet_grid(metric~., scales = 'free_y') +
+	guides(color = FALSE)
+
+```
+
+To see what signal is left in the data, we can inspect the average remainder: 
+
+```{r, fig.margin = T, fig.cap = "Mean remainder signal over time."}
+prices_modeled %>% 
+	group_by(date) %>% 
+	summarise(mean_r = mean(remainder, na.rm = T)) %>% 
+	ggplot() + 
+	geom_line(
+		aes(x = date, 
+			y = remainder, 
+			group = listing_id), 
+		data = prices_modeled, 
+		color = 'grey', alpha = .1) + 
+	geom_line(aes(x = date, y = mean_r)) +
+	theme_minimal() + 
+	ylim(-20, 20)
+```
+
+Compared to our previous plot, it's clear that we haven't perfectly modeled most series: but it's also clear that we've made significant progress toward *isolating the signal* in April. On average, the remainder is fairly close to 0, but there's a big exception: there's a clear jump of around $10 on average that can't be explained by either long-term seasonal trends or weekly periodicity.  
+
+# Isolating the Signal
+
+It's time to identify the listings that have very large spikes in April. There are lots of ways to perform this task. One approach could be: 
+
+> Find listings who have significantly above-average prices for at least some days in April. 
+
+There's nothing wrong with this approach, and it's a good exercise with `dplyr` to try it. But we can use our tidy modeling framework to do something a bit more sophisticated, for which we'll turn to our old friend k-means. 
+
+Recall that `R`'s implementation of k-means requires a matrix in which each row is a point and each column is a dimension. This isn't a tidy format, but we can construct it easily enough using tidy tools. Since we know that the signal we want to isolate is in April, let's focus on just April months: 
+
+```{r}
+april_prices <- prices_modeled %>%
+	filter(month(date, label = T) == 'Apr') %>% 
+	select(listing_id, date, remainder)
+```
+
+To get the matrix format data we need to `spread` out our long-format data into wide-format data. However, we have a problem if we do that directly:
+
+```{r, error = TRUE}
+
+mat1 <- april_prices %>% 
+	spread(key = date, value = remainder) %>% 
+	select(-listing_id) %>% 
+	as.matrix()
+
+kmeans(mat1, 10)
+```
+
+The problem is that we have `r sum(is.na(mat1))` NA entries in our matrix. Where did they come from? We didn't have any NAs in the `april_prices` data...
+
+```{r}
+april_prices$remainder %>% is.na() %>% sum()
+```
+
+## Explicit and Implicit Missing Data
+
+The problem is that, though we don't have any *explicitly* missing data, we do have some *implicitly* missing data. 
+
+> A row of a data frame is ***explicitly missing*** when there is an `NA` in the value column. 
+> A row of data is ***implicitly missing*** when not all combinations of factor levels are present as rows. 
+
+Let's take a look at some examples. The following data frame has no missing data: 
+```{r, fig.margin = T, echo = FALSE}
+data.frame(group_1 = c('1', '1', '2', '2'), 
+		   group_2 = c('a', 'b', 'a', 'b'), 
+		   value = c(5.4, 4.7, 9.0, 8.1)) %>% 
+	kable()
+```
+
+On the other hand, this data frame has an *explicitly missing* row: 
+```{r, echo = FALSE}
+data.frame(group_1 = c('1', '1', '2', '2'), 
+		   group_2 = c('a', 'b', 'a', 'b'), 
+		   value = c(5.4, 4.7, 9.0, NA)) %>% 
+	kable()
+```
+
+Finally, this data frame has just as much missing data, but no explicitly `NA`s; its final row is *implicitly missing*. 
+
+```{r, echo = FALSE}
+data.frame(group_1 = c('1', '1', '2'), 
+		   group_2 = c('a', 'b', 'a'), 
+		   value = c(5.4, 4.7, 9.0)) %>% 
+	kable()
+```
+
+
+## Identifying Implicitly Missing Data
+
+<!-- Wittgenstein quote in here?? -->
+
+So, how much implicitly missing data do we have? We can check by comparing the amount of data we have to the product of levels of our factors:
+
+```{r}
+n_listings <- n_distinct(april_prices$listing_id)
+n_dates    <- n_distinct(april_prices$date)
+	
+n_missing  <- n_listings * n_dates - nrow(april_prices)
+```
+
+We can check that the amount of missing data identified by this method is the same as the number of `NA`s in `mat1`: 
+
+```{r}
+n_missing == mat1 %>% is.na() %>% sum()
+```
+
+## Making the Implicit Explicit
+
+Alright, time to do something about it. We want to make our implicitly missing data explicit, so that we can work only with the clusters that have complete data in April. As usual, Hadley has a solution: `tidyr::complete` will fill in missing rows with `NA`s in exactly the way we want. We just need to specify the factor variables: 
+
+```{r}
+prices_to_cluster <- april_prices %>% 
+	complete(listing_id, date)
+```
+
+Let's check that we now have the appropriate number of rows: 
+
+```{r}
+nrow(prices_to_cluster) == n_listings * n_dates
+```
+
+Now that all our missing data is explicit, we can filter out any incomplete series using a *grouped filter*:
+
+```{r}
+prices_to_cluster <- prices_to_cluster %>% 
+	group_by(listing_id) %>% 
+	filter(sum(is.na(remainder)) == 0) %>% 
+	ungroup()
+```
+
+We have `r prices_to_cluster$listing_id %>% n_distinct()` listings with complete price data in April. 
+
+## Prep the k-means data
+
+Now that our data is complete, we can finally make the k-means matrix.  This is a simple application of `tidyr::spread`:
+
+```{r}
+listing_ids <- prices_to_cluster$listing_id %>% unique() 
+
+prices_to_cluster <- prices_to_cluster %>%
+	spread(key = date, value = remainder, fill = NA) %>%
+	select(-listing_id) %>% 
+	as.matrix()
+```
+
+## Tidy Model Selection 
+
+You've already seen k-means in the previous session, where you grouped listings into six clusters or "types." But why six? How can you choose? Sometimes the answer comes from theory, but in many circumstances we need the data to "tell" us how many clusters we should use. To do this, we fit many models with different numbers of clusters to the data and compare their performance. Since this is a "fit many models" task, we'll use some familiar tools. The main difference is that now the data is living in a non-tidy format, so our workflow will be a little different. 
+
+First, let's fit 10 models for each $k = 1,\ldots,10$. 
+```{r}
+set.seed(1236) # handle randomization
+cluster_models <- data.frame(k = rep(1:10, 10)) %>% 
+	group_by(k) %>% 
+	mutate(kclust = map(k, ~ kmeans(prices_to_cluster, .)))
+cluster_models
+```
+Just like before, we have a data frame where one of the columns is a column of models. We now need to select a diagnostic measure of model performance. In `k-means`, the standard diagnostic is the "within group sum of squares," which intuitively measures the amount of data variation *not* captured by the cluster model. We can extract this information using `broom::glance`: 
+
+```{r}
+cluster_performance <- cluster_models %>% 
+	mutate(summary = map(kclust, glance)) %>% 
+	unnest(summary)
+```
+
+We can now visualize the mean cluster performance: 
+
+```{r, fig.margin = T}
+cluster_performance %>% 
+	group_by(k) %>% 
+	summarise(withinss = mean(tot.withinss)) %>% 
+	ggplot() + 
+	aes(x = k, y = withinss) +
+	geom_line() 
+```
+
+Judging from this plot, it looks like we may only want 2, or at most 3 clusters -- more clusters than that contribute very little to the cluster quality. 
+
+## Working with a model
+
+Now it's time to explore the models we've fitted in more detail. Since we've already done 100 of them, we don't need to do another one: we'll just extract the predictions from each using the same function (`broom::augment`) that we used previously. The result should look pretty familiar by now. 
+
+```{r}
+cluster_preds <- cluster_models %>% 
+	mutate(model_summary = map(kclust, augment, prices_to_cluster))
+cluster_preds
+```	
+
+Since we know we want 2 clusters, let's just pick the first 2-cluster model predictions: 
+
+```{r}
+preds <- cluster_preds$model_summary[[2]] %>% tbl_df()
+```
+
+We have a bit of cleaning to do: we need to add back the listing ids, reshape the data, and make the date column more workable: 
+
+```{r}
+preds <- preds %>% 
+	mutate(listing_id = listing_ids) %>% 
+	gather(key = date, value = remainder, -.cluster, -listing_id) %>% 
+	mutate(date = str_sub(date, 2),
+		   date = ymd(date))
+```
+
+Ok, ready to visualize! 
+
+```{r, fig.margin = T}
+preds %>% 
+	ggplot() + 
+	aes(x = date, y = remainder, group = listing_id) + 
+	geom_line() + 
+	facet_wrap(~.cluster, nrow = 2) + 
+	theme(strip.text.x = element_blank())
+```
+
+Pretty good! We've successfully extracted strong signals from some weaker ones, though notice that the clustering isn't perfect. We'll take cluster 2 as our data set to investigate further: 
+
+```{r}
+april_listings <- preds %>% filter(.cluster == 2)
+```
+
+How many unique listings does that leave us? 
+
+```{r}
+april_listings$listing_id %>% n_distinct()
+```
+
+## Visualizing the Assignments
+
+It's finally time for us to take a look at our assignments. If we superimpose them over a map of Boston, we can see a few obvious concentrations: 
+
+```{r, fig.margin = T, fig.cap = "Geographic visualization of listings that are more expensive in April.", warning = FALSE, message = FALSE}
+
+m <- ggmap::get_map('Copley Square, Boston', zoom = 14)
+
+april_locations <- listings %>% 
+	filter(id %in% april_listings$listing_id) 
+
+ggmap::ggmap(m) + 
+	ggplot2::geom_point(aes(x = longitude, y = latitude), data = april_locations)
+```
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
+

@@ -1,0 +1,168 @@
+---
+title: "Advanced Topics in Data Science"
+author: "Phil"
+date: "January 19th, 2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE)
+library(knitr)
+```
+
+```{r, include = FALSE}
+listings <- read_csv('data/listings.csv')
+calendar <- read_csv('data/calendar.csv')
+```
+
+
+# Hello
+
+## Goals for Today
+
+1. Go deeper in how "tidy" tools in `R` help you **navigate the data analysis pipeline.** 
+2. Illustrate tidy approaches to some advanced data science tasks:
+	- Fit, evaluate, and visualize **many models simultaneously.**
+	- Diagnose **implicitly missing data** and make it explicit. 
+
+Our running example will be time series data, so we'll also learn some basic methods for handling dates and time-series data. 
+	
+## Schedule
+
+## The Data Science Pipeline
+
+```{r, out.height = 300, echo = FALSE}
+knitr::include_graphics('https://ismayc.github.io/moderndiver-book/images/tidy1.png')
+```
+
+- You've already learned how to execute on those middle three components individually. 
+- Tidy pipelines help you **synthesize** your skills for efficiently iterating in that middle loop. 
+
+
+
+## The Tidyverse
+
+<!-- Pic of Hadley -->
+
+## Operationally....
+
+> You can do **almost anything** as a data frame computation in a way that is **efficient**, **organized**, and **flexible** -- in a word, ***tidy***. 
+
+## Key Packages
+
+1. `dplyr` -- Add columns, filter, summarise. 
+2. `tidyr` -- Change the "shape" of your data, including **nesting** it (much more soon).
+3. `purrr` -- Functional programming tools for iterating over lists
+4. `broom` -- Retrieve model results, such as diagnostics and predictions, in tidy format. 
+
+```{r, warning = FALSE, message = FALSE}
+packages <- c('tidyverse', 'broom', 'ggmap', 'lubridate', 'stringr')
+for(package in packages) library(package, character.only = T)
+```
+
+# Warmup
+
+## Manipulating Dates
+
+```{r}
+calendar
+```
+
+
+## Exercise 0.0
+
+Add `year`, `month`, and `weekday` columns to `calendar`. You'll need the `year`, `month` and `wday` functions from `lubridate`, as well as the `label` argument. 
+```{r, echo = FALSE}
+calendar %>% 
+	mutate(year = year(date),
+		   month = month(date, label = T), 
+		   weekday = wday(date, label = T)) %>% 
+	head(5)
+```
+
+
+
+# Data Frames
+
+## Data Frames...of Data Frames
+
+Key function: `tidyr::nest`. Start here: 
+
+```{r}
+calendar %>% head()
+```
+
+## Data Frames...of Data Frames
+
+Get this: 
+
+```{r}
+calendar %>% 
+	nest(-listing_id) %>% 
+	head()
+```
+
+## Why??? 
+
+```{r}
+calendar %>% 
+	nest(-listing_id) %>% 
+	head()
+```
+
+**Core insight:** We can now do operations on each data frame at once using `mutate`.
+
+## Exercise 1
+
+
+
+
+
+# Implicit and Explicit Missing Data
+
+## Complete Data
+
+```{r, fig.margin = T, echo = FALSE}
+data.frame(group_1 = c('1', '1', '2', '2'), 
+		   group_2 = c('a', 'b', 'a', 'b'), 
+		   value = c(5.4, 4.7, 9.0, 8.1)) %>% 
+	kable()
+```
+
+## Explicitly Missing Data
+```{r, echo = FALSE}
+data.frame(group_1 = c('1', '1', '2', '2'), 
+		   group_2 = c('a', 'b', 'a', 'b'), 
+		   value = c(5.4, 4.7, 9.0, NA)) %>% 
+	kable()
+```
+
+## Implicitly Missing Data
+
+```{r, echo = FALSE}
+data.frame(group_1 = c('1', '1', '2'), 
+		   group_2 = c('a', 'b', 'a'), 
+		   value = c(5.4, 4.7, 9.0)) %>% 
+	kable()
+```
+
+## Making the Implicit Explicit
+
+```{r}
+data.frame(group_1 = c('1', '1', '2'), 
+		   group_2 = c('a', 'b', 'a'), 
+		   value = c(5.4, 4.7, 9.0)) %>% 
+	complete(group_1, group_2) %>% 
+	kable()
+```
+
+
+# Reference
+
+## More on the Tidyverse
+
+## More on Tidy Modeling
+
+
+
+
