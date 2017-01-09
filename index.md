@@ -6,44 +6,53 @@ In 2017, 15.S60 was organized by [Brad Sturt](https://github.com/brad-sturt) and
 
 # Course Materials
 
-### 1. Introduction -- *Jackie Baek and Brad Sturt*
+## 1. Introduction -- *Jackie Baek and Brad Sturt*
 *Focuses on....*
 
 **Slides**
 
-[Introduction to Terminal](https://philchodrow.github.io/cos_2017/1_terminal_and_git/Introduction to terminal.pdf)
-
-[Introduction to git and GitHub](https://philchodrow.github.io/cos_2017/1_terminal_and_git/Introduction to git.pdf)
+1. [Introduction to Terminal](https://philchodrow.github.io/cos_2017/1_terminal_and_git/Introduction to terminal.pdf)
+2. [Introduction to git and GitHub](https://philchodrow.github.io/cos_2017/1_terminal_and_git/Introduction to git.pdf)
 
 **Code and Data**
 
-[Introduction to `R`](https://philchodrow.github.io/cos_2017/1_terminal_and_git/intro.R)
+- [Introduction to `R`](https://philchodrow.github.io/cos_2017/1_terminal_and_git/intro.R)
+- [Sample Data Set](https://philchodrow.github.io/cos_2017/1_terminal_and_git/taxi_data.csv), courtesy of the [New York City Taxi and Limousine Commission](http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml)
 
-[Sample Data Set](https://philchodrow.github.io/cos_2017/1_terminal_and_git/taxi_data.csv), courtesy of the [New York City Taxi and Limousine Commission](http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml)
-
-### 2. Data Wrangling and Visualization -- *Steve Morse*
+## 2. Data Wrangling and Visualization -- *Steve Morse*
 *Focuses on....*
 
 
 Sessions 2-4 all use a data set of Boston AirBnB rentals, provided courtesy of [AirBnB and Kaggle](https://www.kaggle.com/airbnb/boston). You can download each of the three components by clicking the links below: 
 
-[`listings.csv`](https://philchodrow.github.io/cos_2017/data/listings.csv)
+- [`listings.csv`](https://philchodrow.github.io/cos_2017/data/listings.csv)
+- [`calendar.csv`](https://philchodrow.github.io/cos_2017/data/calendar.csv)
+- [`reviews.csv`](https://philchodrow.github.io/cos_2017/data/reviews.csv)
 
-[`calendar.csv`](https://philchodrow.github.io/cos_2017/data/calendar.csv)
+1. [Notes](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_master.html)
 
-[`reviews.csv`](https://philchodrow.github.io/cos_2017/data/reviews.csv)
+2. [Exercises](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_exercises.R) and [solutions](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_exercises_solved.R)
 
-[Notes](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_master.html)
-
-[Exercises](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_exercises.R) and [solutions](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_exercises_solved.R)
-
-### 3. Statistical Modeling and Machine Learning -- *Clark Pixton and Colin Pawlowski*
+## 3. Statistical Modeling and Machine Learning -- *Clark Pixton and Colin Pawlowski*
 *Focuses on....*
 
-### 4. Advanced Topics in Data Science -- [*Phil Chodrow*](https://philchodrow.github.io/)
+## 4. Advanced Topics in Data Science -- [*Phil Chodrow*](https://philchodrow.github.io/)
 *Focuses on....*
 
 
-[Slides](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.html)
+- [Slides](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.html)
+- [Notes](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html)
 
-[Notes](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html)
+## 5. Introduction to Julia and JuMP, Linear Optimization, and Engaging -- *Sebastien Martin and Joey Huchette*
+*Focuses on....*
+
+
+## 6. Nonlinear and Integer Optimization in JuMP --  *Miles Lubin and Yee Sian Ng*
+*Focuses on....*
+
+## 7. Excel for Operations Research -- *Charlie Thraves*
+*Focuses on....*
+
+## 8. Deep Learning in TensorFlow Python -- *Eli Gutin and Brad Sturt*
+*Focuses on....*
+
