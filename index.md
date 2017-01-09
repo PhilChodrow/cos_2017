@@ -30,7 +30,6 @@ Sessions 2-4 all use a data set of Boston AirBnB rentals, provided courtesy of [
 - [`reviews.csv`](https://philchodrow.github.io/cos_2017/data/reviews.csv)
 
 1. [Notes](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_master.html)
-
 2. [Exercises](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_exercises.R) and [solutions](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_exercises_solved.R)
 
 ## 3. Statistical Modeling and Machine Learning -- *Clark Pixton and Colin Pawlowski*
