@@ -7,11 +7,13 @@ In this session, we will introduce basic techniques in data wrangling and visual
 
 To ensure that you have the most current versions of all files, please fire up a terminal, navigate to the directory into which you cloned the full set of materials for the course, and run `git pull`.  (Refer back to Session 1 if you're having trouble here.)
 
+Before class, it is recommended to skim through the [online session notes](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_master.html).
+
 We recommend you follow along in class using the `S2_script.R` and `S2_exercises.R` files, which will allow you to live-code along with the session leader and work through un-solved exercises.  
 
 It may be helpful, however, to also keep handy the `S2_script_full.R` and `S2_exercises_solved.R` files which have all code and exercise answers filled in.
 
-Also provided is the `S2_master.html` file which you can open in a browser.  (The `S2_master.Rmd` file produces the HTML document and can be ignored.)
+(The `S2_master.Rmd` and `S2_master.html` files creating the [online session notes](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_master.html) can be ignored.)
 
 
 ## Pre-assignment 2: Installing libraries
