@@ -8,12 +8,14 @@ Before the first class, please complete the following tasks.
 
 * We will be using Github to distribute code. Please go to www.github.com and make a free account. 
 
-## Task 2: Download RStudio
+## Task 2: Download `R` and RStudio
 
-* We will be learning the R programming language. The classes will be using a program called RStudio to write and run R code. Please go to www.rstudio.com and download RStudio desktop. It should be free. 
-* After going through the installation steps, verify it works correctly by typing 1+2 into the the bottom of the screen in the Console, and click Enter. 
-* Later in the class we will require the most recent version of R (>= 3.3.1). If you already had R installed on your computer, you may have an earlier version. To check and update the R version, follow the steps in pre-lecture-assignment-1.R.
+We will be learning the `R` programming language for statistical computation. To interact with `R`, we will use RStudio to write and execute `R` commands. 
 
+* **Install `R`**: Navigate to https://cran.cnr.berkeley.edu/ and follow the instructions for your operating system. 
+* **Download RStudio**: Navigate to https://www.rstudio.com/products/rstudio/download/ and download RStudio Desktop with an Open Source License. 
+* **Test Your Installation**: Open RStudio and type 1+2 into the Console window, and type "Enter."
+* Later in the class we will require the most recent version of R (>= 3.3.1). If you already had R installed on your computer, you may have an earlier version. To check and update the R version, you can either follow the **Install `R`** instructions above or follow the steps in pre-lecture-assignment-1.R.
 
 ## Task 3 (Windows Users Only): Download Putty
 
