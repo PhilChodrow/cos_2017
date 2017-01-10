@@ -49,7 +49,7 @@ data.frame(x=rnorm(1000), y=rnorm(1000)) %>% ggplot(aes(x,y)) + geom_point()
 ```
 which should produce a cloud of points centered around the origin.
 
-You do not need to upload anything to Stellar for this session.
+**Please upload a screenshot of these two outputs to Stellar (the table and the scatter plot).**
 
 
 ## Additional Resources
