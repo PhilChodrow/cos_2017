@@ -58,7 +58,7 @@
 
 # We'll learn some cleaner (and hopefully more intuitive) ways to **select** and **filter** and **summarize** the data like this later.  But for now, let's try visualizing some of it.	
 
-# How about the distribution of reviews? We want to run something like 
+# How about the distribution of price? We want to run something like 
 hist(listings$price)
 # but this gives an error: "price is not numeric".  Why?	
 str(listings$price)        # notice it says "Factor w/ 324 Levels"	
@@ -140,7 +140,10 @@ install.packages('dplyr')
 # Another advantage is we can create a new column, and then use those new values immediately in another column!  Let's create a new column that is the "weekly price per day" called `weekly_price_per` by dividing the weekly price by 7.  Then let's use that number and the daily price rate to compute the difference between the two (i.e. the discount by taking the weekly rate).  Then we'll look at the average of this discount across all listings.	
 
 
-# Average discount per day for booking by the week: about 20 bucks!  	
+# Average discount per day for booking by the week: about 20 bucks! 
+
+# Let's take a deeper look at prices, and we can make our lives easier by just overwriting that price column with the numeric version and saving it back into our `listings` data frame:
+
 
 # Now --- what if we want to look at mean price, and `group_by` neighborhood?	
 
@@ -198,7 +201,7 @@ install.packages('ggplot2')
 
 
 
-# That scatterplot of the price against the review score seemed interesting, we'd like to revisit it.  First let's save the numeric price column into our listings data table, just for convenience
+# That scatterplot of the price against the review score seemed interesting, we'd like to revisit it.  First let's save the numeric price column into our listings data table, just for convenience (you should have already done this in the previous section, but just in case):
 	
 
 # Now, we chain this into the `ggplot` function...	

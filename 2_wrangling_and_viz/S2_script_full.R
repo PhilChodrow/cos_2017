@@ -66,7 +66,7 @@ table(listings$room_type, listings$accommodates >= 4)
 
 # We'll learn some cleaner (and hopefully more intuitive) ways to **select** and **filter** and **summarize** the data like this later.  But for now, let's try visualizing some of it.	
  	
-# How about the distribution of reviews? We want to run something like 
+# How about the distribution of prices? We want to run something like 
 hist(listings$price)
 # but this gives an error: "price is not numeric".  Why?	
 str(listings$price)        # notice it says "Factor w/ 324 Levels"	
@@ -160,17 +160,18 @@ listings %>%
          weekly_discount = price - weekly_price_per) %>%	
   summarize(avg_discount = mean(weekly_discount, na.rm=T))	
 
-# Average discount per day for booking by the week: about 20 bucks!  	
+# Average discount per day for booking by the week: about 20 bucks! 
+
+# Let's take a deeper look at prices, and we can make our lives easier by just overwriting that price column with the numeric version and saving it back into our `listings` data frame:
+listings = listings %>% mutate(price = as.numeric(gsub('\\$|,', '', price)))
 
 # Now --- what if we want to look at mean price, and `group_by` neighborhood?	
 listings %>% 	
-  mutate(price = as.numeric(gsub('\\$|,', '', price))) %>%	
   group_by(neighbourhood_cleansed) %>%	
   summarize(avg.price = mean(price))	
 
 # Maybe we're a little worried these averages are skewed by a few outlier listings. Let's try	
 listings %>%	
-  mutate(price = as.numeric(gsub('\\$|,', '', price))) %>%	
   group_by(neighbourhood_cleansed) %>%	
   summarize(avg.price = mean(price),	
             med.price = median(price),	
@@ -181,7 +182,6 @@ listings %>%
 # - Second, if the *median* is very different than the *mean* for a particular neighborhood, it indicates that we have *outliers* skewing the average.  Because of those outliers, as a rule of thumb, means tend to be a misleading statistic to use with things like rent prices or incomes.  	
 # One thing we can do is just filter out any neighborhood below a threshold count:	
 listings %>%	
-  mutate(price = as.numeric(gsub('\\$|,', '', price))) %>%	
   group_by(neighbourhood_cleansed) %>%	
   summarize(avg.price = mean(price),	
             med.price = median(price),	
@@ -190,7 +190,6 @@ listings %>%
 
 # We can also `arrange` this info (sort it) by the hopefully more meaningful median price:	
 listings %>%	
-  mutate(price = as.numeric(gsub('\\$|,', '', price))) %>%	
   group_by(neighbourhood_cleansed) %>%	
   summarize(avg.price = mean(price),	
             med.price = median(price),	
@@ -201,7 +200,6 @@ listings %>%
 # (Descending order would just be `arrange(desc(med.price))`.)  We can also pick a few neighborhoods to look at by using the `%in%` keyword in a `filter` command with a list of the neighborhoods we want:	
 listings %>%	
   filter(neighbourhood_cleansed %in% c('Downtown', 'Back Bay', 'Chinatown')) %>%	
-  mutate(price = as.numeric(gsub('\\$|,', '', price))) %>%	
   group_by(neighbourhood_cleansed) %>%	
   summarize(avg.price = mean(price),	
             med.price = median(price),	
@@ -245,7 +243,7 @@ install.packages('ggplot2')
 # and load it into your session 	
 library(ggplot2)	
 
-# That scatterplot of the price against the review score seemed interesting, we'd like to revisit it.  First let's save the numeric price column into our listings data table, just for convenience
+# That scatterplot of the price against the review score seemed interesting, we'd like to revisit it.  First let's save the numeric price column into our listings data table, just for convenience (you should have already done this in the previous section, but just in case):
 listings = listings %>% mutate(price = as.numeric(gsub('\\$|,', '', price)))	
 
 # Now, we chain this into the `ggplot` function...	

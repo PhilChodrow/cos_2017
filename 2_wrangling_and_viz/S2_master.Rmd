@@ -103,7 +103,7 @@ table(listings$room_type, listings$accommodates >= 4)
 
 We'll learn some cleaner (and hopefully more intuitive) ways to **select** and **filter** and **summarize** the data like this later.  But for now, let's try visualizing some of it.
 
-How about the distribution of reviews?  
+How about the distribution of daily rates/prices?  
 
 We want to run something like `hist(listings$price)`, but this gives an error: "price is not numeric". (Try it!)  Why?
 ```{r eval=FALSE}
@@ -295,12 +295,16 @@ listings %>%
   summarize(avg_discount = mean(weekly_discount, na.rm=T))
 ```
 
-Average discount per day for booking by the week: about 20 bucks!  
+Average discount per day for booking by the week: about 20 bucks! 
+
+Let's take a deeper look at prices, and we can make our lives easier by just overwriting that price column with the numeric version and saving it back into our `listings` data frame:
+```{r}
+listings = listings %>% mutate(price = as.numeric(gsub('\\$|,', '', price)))
+```
 
 Now --- what if we want to look at mean price, and `group_by` neighborhood?
 ```{r}
 listings %>% 
-  mutate(price = as.numeric(gsub('\\$|,', '', price))) %>%
   group_by(neighbourhood_cleansed) %>%
   summarize(avg.price = mean(price))
 ```
@@ -308,7 +312,6 @@ listings %>%
 Maybe we're a little worried these averages are skewed by a few outlier listings. Let's try
 ```{r}
 listings %>%
-  mutate(price = as.numeric(gsub('\\$|,', '', price))) %>%
   group_by(neighbourhood_cleansed) %>%
   summarize(avg.price = mean(price),
             med.price = median(price),
@@ -324,7 +327,6 @@ The `n()` function here just gives a count of how many rows we have in each grou
 One thing we can do is just filter out any neighborhood below a threshold count:
 ```{r}
 listings %>%
-  mutate(price = as.numeric(gsub('\\$|,', '', price))) %>%
   group_by(neighbourhood_cleansed) %>%
   summarize(avg.price = mean(price),
             med.price = median(price),
@@ -335,7 +337,6 @@ listings %>%
 We can also `arrange` this info (sort it) by the hopefully more meaningful median price:
 ```{r}
 listings %>%
-  mutate(price = as.numeric(gsub('\\$|,', '', price))) %>%
   group_by(neighbourhood_cleansed) %>%
   summarize(avg.price = mean(price),
             med.price = median(price),
@@ -348,7 +349,6 @@ listings %>%
 ```{r}
 listings %>%
   filter(neighbourhood_cleansed %in% c('Downtown', 'Back Bay', 'Chinatown')) %>%
-  mutate(price = as.numeric(gsub('\\$|,', '', price))) %>%
   group_by(neighbourhood_cleansed) %>%
   summarize(avg.price = mean(price),
             med.price = median(price),
@@ -462,7 +462,7 @@ First, make sure you've got `ggplot2` installed (with `install.packages('ggplot2
 library(ggplot2)
 ```
 
-That scatterplot of the price against the review score seemed interesting, we'd like to revisit it.  First let's save the numeric price column into our listings data table, just for convenience
+That scatterplot of the price against the review score seemed interesting, we'd like to revisit it.  First let's save the numeric price column into our listings data table, just for convenience (you should have already done this in the previous section, but just in case):
 ```{r}
 listings = listings %>% mutate(price = as.numeric(gsub('\\$|,', '', price)))
 ```
@@ -793,7 +793,6 @@ Note that if you tried to use the colorblind palette again, you probably ran out
 *ANSWER:*
 ```{r}
 listings %>%
-  mutate(price = as.numeric(gsub('\\$|,','',price))) %>%
   group_by(bedrooms, bathrooms) %>%
   summarize(med = median(price)) %>%
   ggplot(aes(x=bedrooms, y=bathrooms, fill=med)) +
@@ -803,7 +802,6 @@ listings %>%
 BONUS: We can enforce that the color scale runs between two colors by adjusting a `scale_fill_gradient` theme, like this:
 ```{r}
 listings %>%
-  mutate(price = as.numeric(gsub('\\$|,','',price))) %>%
   group_by(bedrooms, bathrooms) %>%
   summarize(med = median(price)) %>%
   ggplot(aes(x=bedrooms, y=bathrooms, fill=med)) +
