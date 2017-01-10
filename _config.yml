@@ -1,7 +1,7 @@
 title: Computing in Optimization and Statistics 2017
 description: Offered by the Operations Research Center at MIT
 google_analytics: 
-show_downloads: true
+show_downloads: false
 theme: jekyll-theme-dinky
 
 gems:
