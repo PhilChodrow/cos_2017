@@ -40,7 +40,7 @@ listings[4,'host_since_date'] - listings[3,'host_since_date']
 # There is a ton more to learn here, if you are interested.  `Date` can handle any format, including numeric formats (like Excel generates or UNIX time stamps), but sometimes the difficulty is something like handling dates that are formatted in different ways in the same column, or contain errors ("Marhc 27th") ...	
 
 
-# ***Exercise 4. Text handling.***  We have seen the `chr` data type, which can be single characters or strings of characters.  We can get substrings of a string using `substr()`; for example `substr("I love R", start=1, stop=4)` gives "I lo".  We can paste two strings together using `paste()`; for example `paste("Hello", "there")` gives "Hellothere" (no space).  We can substitute one string into another using `sub()`; for example `sub("little", "big", "Mary had a little lamb")` gives "Mary had a big lamb".  (We used `gsub()` earlier, which just allows multiple substitutions, not just the first occurrence.)	
+# ***Exercise 4. Text handling.***  We have seen the `chr` data type, which can be single characters or strings of characters.  We can get substrings of a string using `substr()`; for example `substr("I love R", start=1, stop=4)` gives "I lo".  We can paste two strings together using `paste()`; for example `paste("Hello", "there")` gives "Hello there" (single space is default).  We can substitute one string into another using `sub()`; for example `sub("little", "big", "Mary had a little lamb")` gives "Mary had a big lamb".  (We used `gsub()` earlier, which just allows multiple substitutions, not just the first occurrence.)	
  	
 # Try creating a new column with the first 5 letters of the host name followed by the full name of the listing without spaces.	
  	
