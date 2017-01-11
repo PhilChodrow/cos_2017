@@ -34,12 +34,12 @@ library(ggplot2)
 
 Then test that dplyr/tidyr work by executing the command:
 ```
-data.frame(name=c('Ann', 'Bob'), number=c(3.14, 2.718)) %>% gather(type, favorite, -name)
+data.frame(name=c('Ann', 'Bob'), number=c(3.141, 2.718)) %>% gather(type, favorite, -name)
 ```
 which should output something like this
 ```
       name   type favorite
-    1  Ann number    3.140
+    1  Ann number    3.141
     2  Bob number    2.718
 ```
 
