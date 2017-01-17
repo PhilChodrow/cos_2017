@@ -63,7 +63,6 @@ A skilled analyst needs to be able to smoothly transition from data manipulation
 While learning these tools, we work a complex case study that will require multiple iterations of manipulation, visualization, and modeling to test a data scientific hypothesis. 
 
 - **Slides**: [Presentation](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.Rmd) and [source](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.html).
-- **Notes**: [Presentation](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html) and [source](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html).
 - **Case Study**: [Student script](cos_2017/4_advanced_topics/case_study_student.R) for the session, [complete script](cos_2017/4_advanced_topics/case_study_complete.R) for reference, and readable [writeup](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html) with [source](https://github.com/PhilChodrow/cos_2017/blob/master/4_advanced_topics/notes.Rmd). 
 
 ## 5. Introduction to Julia and JuMP, Linear Optimization, and Engaging -- *Sebastien Martin and Joey Huchette*
