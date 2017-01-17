@@ -28,7 +28,7 @@ At this stage in your `R` training, you've covered quite a lot of ground. You kn
 - Engineering new features that capture meaningful signal in your data
 - Modeling your data and evaluating the models. 
 
-In today's session, we'll synthesize and build on some of these skills by identifying a cause of an odd spike in AirBnB rental prices.  We'll practice our data manipulation and visualization skills, perform some very basic time-series analysis, and learn to think about data analysis as a process of stripping away different layers of signal in your data. Throughout our discussion, the focus will be on using the "tidy" tools `dplyr`, `tidyr`, and `ggplot2` you learned in Session 2 in the context of an advanced data investigation task that incorporates modeling, complex feature engineering, and visualization. 
+In today's session, we'll synthesize and build on some of these skills by identifying a cause of an odd spike in AirBnB rental prices.  We'll practice our data manipulation and visualization skills, perform some very basic time-series analysis, and learn to think about data analysis as a process of stripping away different layers of signal in your data. Throughout our discussion, the focus will be on using the "tidy" tools like `dplyr`, `tidyr`, and `ggplot2` you learned in Session 2 in the context of an advanced data investigation task that incorporates modeling, complex feature engineering, and visualization. 
 
 In terms of software tools in `R`, we'll: 
 
@@ -436,114 +436,30 @@ april_prices <- prices_modeled %>%
 	select(listing_id, date, remainder)
 ```
 
-To get the matrix format data we need to `spread` out our long-format data into wide-format data. However, we have a problem if we do that directly:
-
-```{r, error = TRUE}
-
-mat1 <- april_prices %>% 
-	spread(key = date, value = remainder) %>% 
-	select(-listing_id) %>% 
-	as.matrix()
-
-kmeans(mat1, 10)
-```
-
-The problem is that we have `r sum(is.na(mat1))` NA entries in our matrix. Where did they come from? We didn't have any NAs in the `april_prices` data...
+To get the matrix format data we need to `spread` out our long-format data into wide-format data. However, we need to ensure that we are only working with listings that have observations for all days in April. There's a bit of subtlety here, since a date may be just missing from the data (rather than indicated with an `NA`). However, we can use `tidyr::complete` to make all the *implicit* missing data (no rows) *explicit* (rows with `NA`s). We can then filter out any listings that have any NAs in the data: 
 
 ```{r}
-april_prices$remainder %>% is.na() %>% sum()
-```
-
-## Explicit and Implicit Missing Data
-
-The problem is that, though we don't have any *explicitly* missing data, we do have some *implicitly* missing data. 
-
-> A row of a data frame is ***explicitly missing*** when there is an `NA` in the value column. 
-> A row of data is ***implicitly missing*** when not all combinations of factor levels are present as rows. 
-
-Let's take a look at some examples. The following data frame has no missing data: 
-```{r, fig.margin = T, echo = FALSE}
-data.frame(group_1 = c('1', '1', '2', '2'), 
-		   group_2 = c('a', 'b', 'a', 'b'), 
-		   value = c(5.4, 4.7, 9.0, 8.1)) %>% 
-	kable()
-```
-
-On the other hand, this data frame has an *explicitly missing* row: 
-```{r, echo = FALSE}
-data.frame(group_1 = c('1', '1', '2', '2'), 
-		   group_2 = c('a', 'b', 'a', 'b'), 
-		   value = c(5.4, 4.7, 9.0, NA)) %>% 
-	kable()
-```
-
-Finally, this data frame has just as much missing data, but no explicitly `NA`s; its final row is *implicitly missing*. 
-
-```{r, echo = FALSE}
-data.frame(group_1 = c('1', '1', '2'), 
-		   group_2 = c('a', 'b', 'a'), 
-		   value = c(5.4, 4.7, 9.0)) %>% 
-	kable()
-```
-
-
-## Identifying Implicitly Missing Data
-
-<!-- Wittgenstein quote in here?? -->
-
-So, how much implicitly missing data do we have? We can check by comparing the amount of data we have to the product of levels of our factors:
-
-```{r}
-n_listings <- n_distinct(april_prices$listing_id)
-n_dates    <- n_distinct(april_prices$date)
-	
-n_missing  <- n_listings * n_dates - nrow(april_prices)
-```
-
-We can check that the amount of missing data identified by this method is the same as the number of `NA`s in `mat1`: 
-
-```{r}
-n_missing == mat1 %>% is.na() %>% sum()
-```
-
-## Making the Implicit Explicit
-
-Alright, time to do something about it. We want to make our implicitly missing data explicit, so that we can work only with the clusters that have complete data in April. As usual, Hadley has a solution: `tidyr::complete` will fill in missing rows with `NA`s in exactly the way we want. We just need to specify the factor variables: 
-
-```{r}
-prices_to_cluster <- april_prices %>% 
-	complete(listing_id, date)
-```
-
-Let's check that we now have the appropriate number of rows: 
-
-```{r}
-nrow(prices_to_cluster) == n_listings * n_dates
-```
-
-Now that all our missing data is explicit, we can filter out any incomplete series using a *grouped filter*:
-
-```{r}
-prices_to_cluster <- prices_to_cluster %>% 
+april_prices <- april_prices %>% 
+	complete(listing_id, date) %>% 
 	group_by(listing_id) %>% 
 	filter(sum(is.na(remainder)) == 0) %>% 
 	ungroup()
 ```
 
-We have `r prices_to_cluster$listing_id %>% n_distinct()` listings with complete price data in April. 
-
-## Prep the k-means data
-
-Now that our data is complete, we can finally make the k-means matrix.  This is a simple application of `tidyr::spread`:
+Now we need to convert these data into a matrix, which is the format that k-means expects. 
 
 ```{r}
-listing_ids <- prices_to_cluster$listing_id %>% unique() 
+prices_to_cluster <- april_prices %>% 
+	spread(key = date, value = remainder) 
 
-prices_to_cluster <- prices_to_cluster %>%
-	spread(key = date, value = remainder, fill = NA) %>%
+prices_matrix <- prices_to_cluster %>% 
 	select(-listing_id) %>% 
 	as.matrix()
 ```
+
+
+
+
 
 ## Tidy Model Selection 
 
@@ -554,8 +470,8 @@ First, let's fit 10 models for each $k = 1,\ldots,10$.
 set.seed(1236) # handle randomization
 cluster_models <- data.frame(k = rep(1:10, 10)) %>% 
 	group_by(k) %>% 
-	mutate(kclust = map(k, ~ kmeans(prices_to_cluster, .)))
-cluster_models
+	mutate(kclust = map(k, ~ kmeans(prices_matrix, .)))
+cluster_models %>% head()
 ```
 Just like before, we have a data frame where one of the columns is a column of models. We now need to select a diagnostic measure of model performance. In `k-means`, the standard diagnostic is the "within group sum of squares," which intuitively measures the amount of data variation *not* captured by the cluster model. We can extract this information using `broom::glance`: 
 
@@ -573,74 +489,93 @@ cluster_performance %>%
 	summarise(withinss = mean(tot.withinss)) %>% 
 	ggplot() + 
 	aes(x = k, y = withinss) +
-	geom_line() 
+	geom_line() + 
+	geom_point()
 ```
 
 Judging from this plot, it looks like we may only want 2, or at most 3 clusters -- more clusters than that contribute very little to the cluster quality. 
 
 ## Working with a model
 
-Now it's time to explore the models we've fitted in more detail. Since we've already done 100 of them, we don't need to do another one: we'll just extract the predictions from each using the same function (`broom::augment`) that we used previously. The result should look pretty familiar by now. 
+Now it's time to explore the models we've fitted in more detail. Since we've already done 100 of them, we don't need to do another one: we'll just extract the predictions from one. Since we know we want 2 clusters, let's just pick the first 2-cluster model predictions. We'll need to attach the clusters to that wide-format data, and then convert back to a data frame. 
 
 ```{r}
-cluster_preds <- cluster_models %>% 
-	mutate(model_summary = map(kclust, augment, prices_to_cluster))
-cluster_preds
-```	
+chosen_model <- cluster_models$kclust[cluster_models$k == 2][[1]]
 
-Since we know we want 2 clusters, let's just pick the first 2-cluster model predictions: 
-
-```{r}
-preds <- cluster_preds$model_summary[[2]] %>% tbl_df()
+prices_clustered <- prices_to_cluster %>% 
+	mutate(cluster = chosen_model$cluster) %>% 
+	gather(key = date, value = price, -cluster, -listing_id) %>% 
+	mutate(date = as.Date(date))
 ```
 
-We have a bit of cleaning to do: we need to add back the listing ids, reshape the data, and make the date column more workable: 
-
-```{r}
-preds <- preds %>% 
-	mutate(listing_id = listing_ids) %>% 
-	gather(key = date, value = remainder, -.cluster, -listing_id) %>% 
-	mutate(date = str_sub(date, 2),
-		   date = ymd(date))
-```
-
-Ok, ready to visualize! 
+Now let's visualize the two clusters. of listing price trend lines. 
 
 ```{r, fig.margin = T}
-preds %>% 
+prices_clustered %>% 
 	ggplot() + 
-	aes(x = date, y = remainder, group = listing_id) + 
+	aes(x = date, y = price, group = listing_id) + 
 	geom_line() + 
-	facet_wrap(~.cluster, nrow = 2) + 
-	theme(strip.text.x = element_blank())
+	facet_wrap(~cluster, nrow = 2)
 ```
 
-Pretty good! We've successfully extracted strong signals from some weaker ones, though notice that the clustering isn't perfect. We'll take cluster 2 as our data set to investigate further: 
+The two clusters segment the data efficiently -- cluster 2 has most of the listings that exhibit large (~$100) price-increases per-person around a single week in April. How many are there in each group? 
+```{r}
+prices_clustered %>% 
+	group_by(cluster) %>% 
+	summarise(n = n_distinct(listing_id)) %>% 
+	kable()
+```
+
+Now we're finally ready to visualize the comparative locations of the two clusters. First we'll make a simple lookup-table that relates listing ids to their clusters. 
 
 ```{r}
-april_listings <- preds %>% filter(.cluster == 2)
+cluster_lookup <- prices_clustered %>% 
+	filter(!duplicated(listing_id)) %>% 
+	select(listing_id, cluster)
 ```
 
-How many unique listings does that leave us? 
+Now we join that table to the listings, and only include listings that have a cluster assigned. 
 
 ```{r}
-april_listings$listing_id %>% n_distinct()
+listings_to_plot <- listings %>% 
+	mutate(id = as.character(id)) %>% 
+	left_join(cluster_lookup, by = c('id' = 'listing_id')) %>% 
+	select(id, cluster, longitude, latitude) %>% 
+	filter(!is.na(cluster)) %>% 
+	unique()
 ```
 
-## Visualizing the Assignments
 
-It's finally time for us to take a look at our assignments. If we superimpose them over a map of Boston, we can see a few obvious concentrations: 
+Now we visualize! First, it's clear that the listings that become dramatically more expensive are concentrated in the downtown area: 
 
-```{r, fig.margin = T, fig.cap = "Geographic visualization of listings that are more expensive in April.", warning = FALSE, message = FALSE}
+```{r, fig.margin = T, warning = FALSE, message = FALSE}
+m <- ggmap::get_map('Copley Square', zoom = 12)
 
-m <- ggmap::get_map('Copley Square, Boston', zoom = 14)
-
-april_locations <- listings %>% 
-	filter(id %in% april_listings$listing_id) 
-
-ggmap::ggmap(m) + 
-	ggplot2::geom_point(aes(x = longitude, y = latitude), data = april_locations)
+ggmap(m) + 
+	geom_point(aes(x = longitude, 
+				   y = latitude, 
+				   color = as.character(cluster)), data = listings_to_plot) + 
+	facet_wrap(~cluster, nrow = 2) + 
+	ggthemes::theme_map() + # install.packages('ggthemes') 
+	guides(color = FALSE)
 ```
+
+When we zoom in, we see that the listings are even concentrated in particular areas downtown. 
+```{r, fig.margin = T, warning = FALSE, message = FALSE}
+m <- ggmap::get_map('Copley Square', zoom = 14)
+
+ggmap(m) + 
+	geom_point(aes(x = longitude, 
+				   y = latitude, 
+				   color = as.character(cluster)), data = listings_to_plot) + 
+	facet_wrap(~cluster, nrow = 2) + 
+	ggthemes::theme_map() + # install.packages('ggthemes') 
+	guides(color = FALSE)
+```
+
+Any ideas? 
+
+
 
 # Session Info
 
