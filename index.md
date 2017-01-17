@@ -40,16 +40,16 @@ This session introduces basic concepts of machine learning and their implementat
 
 - **Slides:** [Machine Learning](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Machine Learning.pdf)
 and [Natural Language Processing](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Natural Language Processing.pdf)
-- **Notes:** [Part 1 - Regression and Splines](https://github.com/PhilChodrow/cos_2017/3_modeling_and_ml/S3_R_script_1.html) and
+- **Notes:** [Part 1 - Regression and Splines](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/S3_R_script_1.html) and
 [Part 2 - Bag-of-Words, CART, and Clustering](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/script_2_complete.html)
 
 ### R Code
 
 - **Part 1:** Script for [in-class](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/S3_R_script_1.R)
- and [with code filled-in](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/S3_R_script_1_full.R)
-- [Exercises](https://github.com/PhilChodrow/cos_2017/3_modeling_and_ml/S3_Exercises_1.R) and [solutions](https://github.com/PhilChodrow/cos_2017/3_modeling_and_ml/S3_Exercises_1_solved.R) for Part 1
+ and [with code filled-in](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/S3_R_script_1_full.R), and [clean_amenities.R](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/clean_amenities.R)
+- [Exercises](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/S3_Exercises_1.R) and [solutions](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/S3_Exercises_1_solved.R) for Part 1
 - **Part 2:** Script for [in-class](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/script_2_inclass.R) and [with code filled-in](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/script_2_complete.R)
-- [**Bonus code**](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/bonus.R) with more machine learning examples for random forest and SVM.  
+- [**Bonus code**](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/bonus.R) with more machine learning examples on random forest and SVM.  
 
 ## 4. Advanced Topics in Data Science -- [*Phil Chodrow*](https://philchodrow.github.io/)
 Data science is rarely cut-and-dried; each analysis typically provides answers but also raises new questions. This makes the data scientific process fundamentally cyclical:
