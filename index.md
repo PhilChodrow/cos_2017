@@ -7,7 +7,7 @@ In 2017, 15.S60 was organized by [Brad Sturt](https://github.com/brad-sturt) and
 # Course Materials
 
 ## 1. Introduction -- *Jackie Baek and Brad Sturt*
-*Focuses on....*
+Introduces foundational concepts and computing tools, including terminal navigation and basic commands; version control with `git` and GitHub; and elementary data inspection and manipulation in `R`. 
 
 **Slides**
 
@@ -33,11 +33,34 @@ Sessions 2-4 all use a data set of Boston AirBnB rentals, provided courtesy of [
 3. [Exercises](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_exercises.R) and [solutions](https://philchodrow.github.io/cos_2017/2_wrangling_and_viz/S2_exercises_solved.R).
 
 ## 3. Statistical Modeling and Machine Learning -- *Clark Pixton and Colin Pawlowski*
-*Focuses on....*
+
+This session introduces basic concepts of machine learning and their implementation in `R`. Topics include elementary regression; regularization and model selection; natural language processing; and model diagnostics. Throughout the session, students use data manipulation and exploration skills to visualize and evaluate models. 
+
+### Machine Learning
+
+- [Slides](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Machine Learning.pdf)
+- [Notes](https://github.com/PhilChodrow/cos_2017/3_modeling_and_ml/S3_R_script_1.html)
+- [Exercises](cos_2017/3_modeling_and_ml/S3_Exercises_1.R) and [solutions](cos_2017/3_modeling_and_ml/S3_Exercises_1_solved.R).
+
+### Natural Language Processing
+
+- [Slides](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Natural Language Processing.pdf)
+- [Notes](cos_2017/3_modeling_and_ml/script_2_complete.html)
 
 ## 4. Advanced Topics in Data Science -- [*Phil Chodrow*](https://philchodrow.github.io/)
-*Focuses on....*
+Data science is rarely cut-and-dried; each analysis typically provides answers but also raises new questions. This makes the data scientific process fundamentally cyclical:
 
+<img src="https://ismayc.github.io/moderndiver-book/images/tidy1.png" alt="The Data Science Pipeline" style="width: 500px;"/>
+
+*Image credit: Hadley Wickham*
+
+A skilled analyst needs to be able to smoothly transition from data manipulation to visualization to modeling and back. In this session, we focus on using the `tidyverse` set of packages to smoothly navigate the Cycle of Data Science. Topics covered include:
+
+1. Reinforcement of Session 2 tools like `dplyr` and `tidyr`.
+2. Efficient, tidy iteration with `purrr` and `map`. 
+3. Tidy model inspection and selection with `broom`. 
+
+While learning these tools, we work a complex case study that will require multiple iterations of manipulation, visualization, and modeling to test a data scientific hypothesis. 
 
 - [Slides](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.html)
 - [Notes](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html)
