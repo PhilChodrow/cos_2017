@@ -46,7 +46,6 @@ This session introduces basic concepts of machine learning and their implementat
 
 - [Slides](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Natural Language Processing.pdf)
 - [Notes](cos_2017/3_modeling_and_ml/script_2_complete.html)
-- [Exercises]() and [solutions]().
 
 ## 4. Advanced Topics in Data Science -- [*Phil Chodrow*](https://philchodrow.github.io/)
 Data science is rarely cut-and-dried; each analysis typically provides answers but also raises new questions. This makes the data scientific process fundamentally cyclical:
