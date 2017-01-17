@@ -1,0 +1,601 @@
+---
+title: 'Modeling and ML: Part 2'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+<style>
+.exercise {
+  border-style: solid;
+  border-color:lightblue;
+  border-radius:5px
+}
+.solution {
+  border-style: solid;
+  border-color:lightgreen;
+  border-radius:5px
+}
+</style>
+
+<https://github.com/PhilChodrow/cos_2017/tree/master/3_modeling_and_ml>
+
+```{r intro, include=FALSE}
+#### Intro stuff to be loaded in during part 1 ####
+# setwd("~/cos_2017/3_modeling_and_ml")
+# install.packages("tidyverse")
+library(tidyverse)
+
+# Read in listings data set, and convert price column to numeric
+# listings = read.csv("../data/listings.csv")
+listings = read.csv("boston-airbnb-open-data/listings.csv")
+listings$price = as.numeric(gsub('\\$|,','',as.character(listings$price)))
+
+reviews = read.csv("boston-airbnb-open-data/reviews.csv", stringsAsFactors = FALSE)
+```
+
+```{r intro_2, eval=FALSE}
+#### Intro stuff to be loaded in during part 1 ####
+setwd("~/cos_2017/3_modeling_and_ml")
+# install.packages("tidyverse")
+library(tidyverse)
+
+# Read in listings data set, and convert price column to numeric
+listings = read.csv("../data/listings.csv")
+listings$price = as.numeric(gsub('\\$|,','',as.character(listings$price)))
+
+# Read in the reviews data set, making sure to set stringsAsFactors=FALSE
+reviews = read.csv("../data/reviews.csv", stringsAsFactors = FALSE)
+```
+
+## Natural Language Processing
+
+View the data from `reviews.csv`. What does each row represent?
+```{r view_reviews}
+head(reviews, 3)
+```
+
+Display the top 10 most reviewed Airbnb listings using the `reviews` data frame.
+Are the counts consistent with the data in the `listings` data frame?
+```{r compare_counts, eval=FALSE}
+sort(listings$number_of_reviews, decreasing = TRUE)[1:10]
+sort(table(reviews$listing_id), decreasing = TRUE)[1:10]
+```
+
+Later on, we will want to merge the two data frames: `listings` and `reviews`.
+The ID variables that we will use for this merge operation are
+`listings$id` and `reviews$listing_id`. It is important to understand the
+data structure before performing the analysis. Both data frames have
+2829 unique listings with >= 1 review - let's confirm this fact.
+```{r explore_unique_listings, eval=FALSE}
+length(unique(listings$id))
+nrow(filter(listings, number_of_reviews>0))
+length(unique(reviews$listing_id))
+```
+</div>
+
+We will take `review_scores_rating` as the dependent variable that we
+are trying to predict.  This is the average customer rating of the Airbnb listing,
+on a scale of 0-100. Plot a simple histogram of `review_scores_rating`,
+and count the number of values != NA.
+```{r explore_review_scores_data, eval=FALSE}
+hist(listings$review_scores_rating)
+sum(!is.na(listings$review_scores_rating))
+```
+
+Next, create a new data frame with just the review scores data from `listings.csv`.
+Filter out rows with `review_scores_rating`=NA.
+```{r review_scores}
+listings_scores = listings %>% 
+  filter(number_of_reviews > 0) %>%
+  select("LISTING_ID"=id, "RATING"=review_scores_rating) %>%
+  filter(!is.na(RATING))
+str(listings_scores)
+```
+
+<div class="exercise">
+**Exercise 2.1:** *Writing a simple function in R*<br>
+The syntax for writing the function f(x) = x^2 is
+```{r simple_fn}
+f <- function(x){
+  return(x*x)
+}
+```
+Write a function to convert the listing rating from
+a scale of 0-100 to ("Terrible","Low","Mid","High","Perfect").<br>
+Given an integer input rating from 0-100, the function should output:<br>
+"Perfect"   if rating = 100<br>
+"High"      if 95 <= rating < 99<br>
+"Mid"       if 90 <= rating < 94<br>
+"Low"       if 80 <= rating < 89<br>
+"Terrible"  if rating <= 79<br>
+For example: convert_rating(64) should output "Terrible"<br>
+</div>
+<div class="solution">
+**Solution:**
+```{r convert_rating}
+convert_rating <- function(rating){
+  if(rating == 100){
+    return("Perfect")
+  }else if(rating >= 95){
+    return("High")
+  }else if(rating >= 90){
+    return("Mid")
+  }else if(rating >= 80){
+    return("Low")
+  }else{
+    return("Terrible")
+  }
+}
+```
+
+Test a few values to make sure that the function works
+```{r test_fn, eval=FALSE}
+convert_rating(100)
+convert_rating(98)
+convert_rating(90)
+convert_rating(82)
+convert_rating(46)
+```
+</div>
+
+To apply the `convert_rating()` function to each element in an array,
+we need to "vectorize" the function first.  Avoid using for-loops
+in R whenever possible because those are slow.
+```{r v_convert_rating}
+v_convert_rating <- Vectorize(convert_rating, c("rating"))
+# Test a few values to make sure that the function works.
+v_convert_rating(c(100,32,87))
+```
+
+Compute the new column using a mutate call.
+```{r new_col}
+listings_scores <- listings_scores %>%
+  mutate(RATING_TEXT = v_convert_rating(RATING))
+
+# Take a look
+table(listings_scores$RATING_TEXT)
+```
+
+These groupings look relatively well-balanced, which is desirable.
+For the NLP task, we will try to predict this rating category
+based upon the text data from `reviews.csv`.
+
+Let's go back to reviews data frame.
+```{r revisit_reviews}
+str(reviews)
+```
+
+Currently, we have a data frame with 68275 rows.
+We would like to have a data frame with 2829 rows - one per each listing.
+We can use the `group_by()` and `summarize()` functions to transform
+the data frame in this way.
+```{r reviews_by_listing}
+reviews_by_listing = reviews %>%
+  select(listing_id,comments) %>%
+  group_by(listing_id) %>%
+  summarize(all_comments=paste(comments,collapse=" "))
+
+# Check out the updated data frame - 2829 rows.
+str(reviews_by_listing)
+```
+
+View the first listing's comments.
+```{r view_comment_1, eval=FALSE}
+reviews_by_listing$all_comments[1]
+```
+
+Observations? What are some problems that we might
+run into with bag-of-words?
+
+*Natural Language Processing slides*
+
+Now, we are ready to construct the Bag-of-Words
+with Airbnb reviews for the prediction task.
+The following step-by-step procedure for building
+the Bag-of-Words is adapted from MIT EdX - Analytics Edge, Lecture 8.
+
+**Step 0:** Install and load two packages for pre-processing:
+```{r text_pre_processing, message=FALSE}
+# install.packages("tm")
+library(tm)
+# install.packages("SnowballC")
+library(SnowballC)
+```
+
+**Step 1:** Convert reviewer comments to a corpus,
+            automatically processing escape characters like "&#92;n".<br>
+**Step 2:** Change all the text to lower case, and convert to
+            "PlainTextDocument" (required after to_lower function).<br>
+**Step 3:** Remove all punctuation.<br>
+**Step 4:** Remove stop words (this step may take a minute).<br>
+**Step 5:** Stem our document.
+```{r corpus}
+corpus = Corpus(VectorSource(reviews_by_listing$all_comments)) %>%
+  tm_map(tolower) %>%
+  tm_map(PlainTextDocument) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeWords, stopwords("english")) %>%
+  tm_map(stemDocument)
+
+# Take a look
+strwrap(corpus[[1]])[1:3]
+
+# Take a look at tm's stopwords:
+stopwords("english")[1:100]
+```
+
+**Step 6:** Create a word count matrix (rows are reviews, columns are words).
+```{r corpus_6}
+frequencies = DocumentTermMatrix(corpus)
+
+# Take a look
+frequencies
+```
+
+**Step 7:** Account for sparsity.
+```{r corpus_7}
+# Use findFreqTerms to get a feeling for which words appear the most.
+# Words that appear at least 10000 times:
+findFreqTerms(frequencies, lowfreq=10000)
+
+# All 45645 terms will not be useful to us. Might as well get rid of some of them - why?
+# Solution: only keep terms that appear in x% or more of the reviews
+# 5% or more (142 or more)
+sparse = removeSparseTerms(frequencies, 0.95)
+
+# How many did we keep? (1136 terms, compared to 45645 previously)
+sparse
+# colnames(sparse)
+```
+
+**Step 8:** Create data frame.
+```{r corpus_8}
+commentsTM = as.data.frame(as.matrix(sparse))
+
+# View data frame (rows are reviews, columns are words)
+str(commentsTM, list.len=10)
+
+# Drop columns that include numbers
+commentsTM = commentsTM[,!grepl("[0-9]",names(commentsTM))]
+```
+
+We have finished building the term frequency data frame `commentsTM`.
+Next, we need to merge the two data frames `commentsTM` (features) and
+`listings_scores` (labels) before we can run our machine learning
+algorithms on this data.  This will be a full-join by `LISTING_ID`.
+```{r nlp_full_join}
+# Add our dependent variable:
+commentsTM$LISTING_ID = reviews_by_listing$listing_id
+commentsTM = full_join(listings_scores, commentsTM)
+
+# Remove all rows with NA's
+commentsTM = na.omit(commentsTM)
+
+# View the first few data frame columns
+# Note: Column names corresponding to word frequencies are lowercase,
+# while all other column names are uppercase.
+names(commentsTM)[1:10]
+```
+
+<div class="exercise">
+**Exercise 2.2:** Your own Bag-of-Words
+Following steps 0-8, build a Bag-of-Words data frame
+on the listings description data.  Add price as the dependent variable,
+name it "PRICE", remove the rows with price=NA,
+and move this column to the front of the new data frame.
+(Hint: Construct the term-matrix listingsTM by modifying
+the NLP code in the file **bonus.R**.)
+</div>
+<!-- <div class="solution"> -->
+<!-- **Solution:** -->
+<!-- ```{r your_own_bag, eval=FALSE} -->
+<!-- str(listings) -->
+<!-- head(listings$description) -->
+<!-- ## **Step 0:** Load two packages for pre-processing: -->
+<!-- library(tm) -->
+<!-- library(SnowballC) -->
+<!-- ## **Steps 1-5:** Convert reviewer comments to a corpus, -->
+<!-- ## perform operations and stem document. -->
+<!-- corpus_2 = Corpus(VectorSource(listings$description)) %>% -->
+<!--   tm_map(tolower) %>% -->
+<!--   tm_map(PlainTextDocument) %>% -->
+<!--   tm_map(removePunctuation) %>% -->
+<!--   tm_map(removeWords, stopwords("english")) %>% -->
+<!--   tm_map(stemDocument) -->
+<!-- ## **Step 6:** Create a word count matrix (rows are reviews, columns are words). -->
+<!-- frequencies_2 = DocumentTermMatrix(corpus_2) -->
+<!-- ## **Step 7:** Account for sparsity. -->
+<!-- sparse_2 = removeSparseTerms(frequencies_2, 0.95) -->
+<!-- ## **Step 8:** Create data frame. -->
+<!-- listingsTM = as.data.frame(as.matrix(sparse_2)) -->
+<!-- listingsTM = listingsTM[,!grepl("[0-9]",names(listingsTM))] -->
+<!-- str(listingsTM) -->
+<!-- str(listings$price) -->
+<!-- listingsTM$PRICE = listings$price -->
+<!-- # Move the `PRICE` column to the front of the data frame -->
+<!-- listingsTM = listingsTM %>% -->
+<!--   select(PRICE, everything()) %>% -->
+<!--   na.omit() -->
+<!-- str(listingsTM, list.len = 5) -->
+<!-- ``` -->
+<!-- </div> -->
+
+Up to here, we have just pre-processed and prepared our data.
+Now, we are ready to build models.
+
+## Building a CART model using Bag-of-Words
+Next, we will use our Bag-of-Words to build a CART model to predict
+review scores.  How could a model like this be useful in practice?
+We will follow the same cross-validation procedure as we did before
+to select the cp parameter for our CART model.
+The only difference is that now our features will be word counts,
+and our predictions will be the discrete values:
+("Terrible","Low","Mid","High","Perfect")
+
+To begin, convert `RATING_TEXT` to a factor variable, and set the order
+of the level values so that they appear properly in our confusion matrix.
+```{r ordered_factor}
+commentsTM$RATING_TEXT = commentsTM$RATING_TEXT %>%
+  as.factor() %>%
+  ordered(levels=c("Terrible","Low","Mid","High","Perfect"))
+str(commentsTM$RATING_TEXT)
+```
+
+Split data into training and testing sets
+```{r split_data, message=FALSE}
+# install.packages("caTools")
+library(caTools)
+set.seed(123)
+spl = sample.split(commentsTM$RATING_TEXT, SplitRatio = 0.7)
+commentsTrain = subset(commentsTM, spl==TRUE)
+commentsTest = subset(commentsTM, spl==FALSE)
+```
+
+Let's use CART! Why CART?
+```{r CART}
+# install.packages("rpart")
+library(rpart)
+# install.packages("rpart.plot")
+library(rpart.plot)
+```
+
+First, train the model using the default parameter values (cp=0.01)
+Of course, we cannot include `RATING` or `LISTING_ID`
+as predictive variables - why not?
+```{r CART_build_first}
+commentsCART = rpart(RATING_TEXT ~ . - RATING - LISTING_ID,
+                     data=commentsTrain,
+                     method="class")
+# Display decision tree.  Does it make intuitive sense?
+prp(commentsCART)
+```
+
+Next, let's perform cross-validation on our
+Bag-of-Words CART model to tune our choice for cp.
+Useful resource for cross-validation of cp in rpart:
+<https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf>
+
+**Step 1:** Begin by constructing a tree with a small cp parameter
+```{r train_big_tree}
+set.seed(2222)
+commentsCART = rpart(RATING_TEXT ~ . - RATING - LISTING_ID, 
+                     data=commentsTrain,
+                     cp=0.001,
+                     method="class")
+```
+
+**Step 2:** View the cross-validated error vs. cp
+```{r view_cv_error_CART}
+# In the `printcp()` table:
+# "nsplit"    = number of splits in tree
+# "rel error" = scaled training error
+# "xerror"    = scaled cross-validation error
+# "xstd"      = standard deviation of xerror
+printcp(commentsCART)
+
+# In the `plotcp()` plot:
+# size of tree = (number of splits in tree) + 1
+# dashed line occurs at 1 std. dev. above the minimum xerror
+# Rule of Thumb: select the model size which first
+#                goes below the dotted line
+plotcp(commentsCART)
+```
+
+**Step 3:** Prune the tree, and take a look
+```{r prune}
+commentsCART = prune(commentsCART,cp=0.007)
+prp(commentsCART)
+```
+
+**Step 4:** Evaluate model in-sample and out-of-sample accuracy,
+using a confusion matrix (because this is a classification problem).
+```{r CART_model_eval}
+# CART on training set:
+PredictCARTTrain = predict(commentsCART, type="class")
+confusionMatrixTrain = table(commentsTrain$RATING_TEXT, PredictCARTTrain)
+confusionMatrixTrain
+# Accuracy?
+sum(diag(confusionMatrixTrain))/nrow(commentsTrain)
+
+# Predictions on test set
+PredictCART = predict(commentsCART, newdata=commentsTest, type="class")
+confusionMatrix = table(commentsTest$RATING_TEXT, PredictCART)
+confusionMatrix
+# Accuracy?
+sum(diag(confusionMatrix))/nrow(commentsTest)
+```
+
+*Question:* How much worse would we have done if we didn't use
+cross-validation, and just stuck with the default cp value (0.01)?
+
+**Step 5:** Compare model to the baseline.  
+```{r baseline}
+# Most frequent response variable in training set is "High"
+# => Baseline accuracy is 0.2720
+table(commentsTest$RATING_TEXT)["High"]/nrow(commentsTest)
+```
+
+Can we improve the accuracy of our model in any way?  Let's try
+adding a few more features from the `listings` data frame.
+```{r more_features,eval=FALSE}
+str(listings)
+more_features = listings %>%
+  select(LISTING_ID=id, SUPER_HOST=host_is_superhost,
+         RESPONSE_TIME=host_response_time,
+         PRICE=price)
+commentsTM = full_join(more_features,commentsTM)
+str(commentsTM,list.len=10)
+```
+
+Rerun the CART model with the following code, and check the out-of-sample performance. Does it improve?  Why or why not?
+```{r CART_rerun,eval=FALSE}
+set.seed(123)
+spl = sample.split(commentsTM$RATING_TEXT, SplitRatio = 0.7)
+commentsTrain = subset(commentsTM, spl==TRUE)
+commentsTest = subset(commentsTM, spl==FALSE)
+commentsCART = rpart(RATING_TEXT ~ . - RATING - LISTING_ID,
+                     data=commentsTrain,
+                     method="class")
+prp(commentsCART)
+
+# CART on training set
+PredictCARTTrain = predict(commentsCART, type="class")
+confusionMatrixTrain = table(commentsTrain$RATING_TEXT, PredictCARTTrain)
+# Accuracy?
+sum(diag(confusionMatrixTrain))/nrow(commentsTrain)
+
+# Predictions on test set
+PredictCART = predict(commentsCART, newdata=commentsTest, type="class")
+confusionMatrix = table(commentsTest$RATING_TEXT, PredictCART)
+# Accuracy?
+sum(diag(confusionMatrix))/nrow(commentsTest)
+```
+
+<div class="exercise">
+**Exercise 2.3:** *Bag-of-Words + LASSO*<br>
+Using the Bag-of-Words constructed in Exercise 2.3, build a LASSO model
+to predict price based upon listing descriptions only.
+(Hint: To build the LASSO model, follow the instructions in part 1 of this module.)
+</div>
+<!-- <div class="solution"> -->
+<!-- **Solution:** -->
+<!-- ```{r bag_of_words_lasso, eval=FALSE} -->
+<!-- # Split data into training and testing sets -->
+<!-- # install.packages("caTools") -->
+<!-- library(caTools) -->
+<!-- set.seed(123) -->
+<!-- spl = sample.split(listingsTM$PRICE, SplitRatio = 0.7) -->
+<!-- listingsTrain = subset(listingsTM, spl==TRUE) -->
+<!-- listingsTest = subset(listingsTM, spl==FALSE) -->
+<!-- # install.packages("glmnet") -->
+<!-- library(glmnet) -->
+<!-- str(listingsTM) -->
+<!-- BagOfWords_LASSO_cv = cv.glmnet(model.matrix(~ . - PRICE,data=listingsTrain), -->
+<!--                                 listingsTrain$PRICE) -->
+<!-- BagOfWords_LASSO_cv -->
+
+<!-- # Test Error -->
+<!-- pred_test=as.vector(predict.cv.glmnet(BagOfWords_LASSO_cv, -->
+<!--                                       newx=model.matrix(~ . - PRICE,data=listingsTest))) -->
+<!-- test_rmse = sqrt(1/length(pred_test)*sum((listingsTest$PRICE-pred_test)^2)) -->
+<!-- test_rmse -->
+
+<!-- # Can you improve the performance of this Lasso model further? -->
+<!-- ``` -->
+<!-- </div> -->
+
+*k-means Clustering slides*
+
+## Unsupervised Learning
+
+Thus far, our machine learning task has been to predict labels,
+which were either continuous-valued (for regression) or
+discrete-valued (for classification).  To do this, we input
+to the ML algorithms some known (feature, label) examples
+(the training set), and the ML algorithm outputs a function
+which enables us to make predictions for some unknown (feature, ?)
+examples (the testing set).  This problem setup is
+known as **Supervised Learning**.
+
+Next, we consider **Unsupervised Learning**, where we are
+not given labelled examples, and we simply run ML algorithms
+on (feature) data, with the purpose of finding interesting
+structure and patterns in the data.  Let's run one of the
+widely-used unsupervised learning algorithms,
+**k-means clustering**, on the `listings` data frame
+to explore the Airbnb data set.
+
+```{r kmeans_help}
+# First, let's look at help page for the function `k-means()`:
+help(kmeans)
+
+# View the data.frame `listings`:
+str(listings, list.len=5)
+```
+
+Let's create a new data.frame `listings_numeric` which
+has the subset of columns that we wish to cluster on.  For the
+`k-means()` function, all of these columns must be numeric.
+
+```{r listings_numeric}
+listings_numeric = listings %>% select(id,latitude,longitude,
+                                       accommodates, bathrooms,
+                                       bedrooms, review_scores_rating,
+                                       price) %>%
+  na.omit()
+str(listings_numeric)
+```
+
+Next, run the **k-means** algorithm on the numeric data.frame,
+with `k = 5` cluster centroids:
+```{r run_kmeans, results="hide"}
+# k-means clustering
+set.seed(1234)
+kmeans_clust = kmeans(listings_numeric[,-1:-3],5, iter=1000, nstart=100)
+kmeans_clust
+```
+
+Look at the average values within the clusters.  What are the characteristics of these 5 groups?  How many listings are in each
+cluster?
+```{r kmeans_avg}
+kmeans_clust$centers
+table(kmeans_clust$cluster)
+```
+
+Finally, let's display the clusters geographically using the (latitude, longitude) data.  First, use `ggmap` to obtain a map of Boston.
+Adapted from <https://www.r-bloggers.com/drug-crime-density-in-boston/>
+```{r ggmap_boston}
+# install.packages("ggmap")
+# devtools::install_github("dkahle/ggmap")
+library(ggmap)
+# requires internet connection
+bos_plot=ggmap(get_map('Boston, Massachusetts',zoom=13,source='google',maptype='terrain'))
+bos_plot
+```
+
+To get good color schemes, use `RColorbrewer`.
+```{r RColorbrewer, fig.height=8}
+# install.packages("RColorbrewer")
+library(RColorBrewer)
+display.brewer.all()
+```
+
+Plot maps and Airbnb locations using the `ggplot` syntax.
+```{r final_plot_kmeans, warning=FALSE}
+bos_plot +
+  geom_point(data=listings_numeric,aes(x=longitude,y=latitude,colour=factor(kmeans_clust$cluster)),
+             alpha=.5,size=1) +
+  xlab("Longitude") + ylab("Latitude") +
+  scale_colour_brewer("Cluster", palette = "Set1")
+```
+
+Can you see where the clusters are?  Also, what is the proper number of clusters? We will revisit this in the next session, because it requires some more advanced tidyverse tools.  Stay tuned!
+
+In this module, we have covered examples of machine learning methods
+for linear regression, LASSO, CART, and k-means.  This is just the
+tip of the iceberg.  There are tons more machine learning methods
+which can be easily implemented in R.  We provide some bonus R code
+for random forest, regularized logistic regression, and SVM applied
+to the Airbnb data set in the file **bonus.R**.
