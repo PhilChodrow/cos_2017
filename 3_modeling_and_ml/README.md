@@ -16,9 +16,9 @@ There are many resources available online to learn more about machine learning a
 - [R for Data Science](http://r4ds.had.co.nz/), an online book on modeling via R's `tidyverse` package.
 - Online courses, including [Johns Hopkins' data science course](https://www.coursera.org/specializations/jhu-data-science) on [Coursera](https://www.coursera.org/)
 - MIT courses, including
-..* 15.071 ("The Analytics Edge", an application and coding-based analytics course),
-..* 6.867 (EECS's introductory Machine Learning course)
-..* 9.520 (A theory course about regularized machine learning methods) 
+ - 15.071 ("The Analytics Edge", an application and coding-based analytics course),
+ - 6.867 (EECS's introductory Machine Learning course)
+ - 9.520 (A theory course about regularized machine learning methods) 
 - R packages `modelr` and `caret`
 - [Data Camp](https://www.datacamp.com/)
 - Jenny Bryan's Stat 545 [course notes](http://stat545.com/)
