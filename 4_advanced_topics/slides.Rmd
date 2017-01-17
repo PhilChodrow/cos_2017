@@ -1,6 +1,6 @@
 ---
-title: "Advanced Topics in Data Science"
-subtitle: "Session 4 of Computing in Optimization and Statistics, 2017"
+title: "Session 4: Advanced Topics in Data Science"
+subtitle: "Computing in Optimization and Statistics, 2017"
 author: "Phil Chodrow"
 date: "January 19th, 2017"
 output: 

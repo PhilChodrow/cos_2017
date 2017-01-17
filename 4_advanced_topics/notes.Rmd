@@ -548,7 +548,7 @@ listings_to_plot <- listings %>%
 
 Now we visualize! First, it's clear that the listings that become dramatically more expensive are concentrated in the downtown area: 
 
-```{r, fig.margin = T, warning = FALSE, message = FALSE}
+```{r, fig.margin = T, warning = FALSE, message = FALSE, fig.cap = 'Geographic view of clustered April listings.', fig.width = 4}
 m <- ggmap::get_map('Copley Square', zoom = 12)
 
 ggmap(m) + 
@@ -561,7 +561,7 @@ ggmap(m) +
 ```
 
 When we zoom in, we see that the listings are even concentrated in particular areas downtown. 
-```{r, fig.margin = T, warning = FALSE, message = FALSE}
+```{r, fig.margin = T, warning = FALSE, message = FALSE, fig.cap = 'Zoomed in view of clustered April listings.'}
 m <- ggmap::get_map('Copley Square', zoom = 14)
 
 ggmap(m) + 
