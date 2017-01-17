@@ -287,7 +287,7 @@ name it "PRICE", remove the rows with price=NA,
 and move this column to the front of the new data frame.
 (Hint: Construct the term-matrix listingsTM by modifying
 the NLP code in the file **bonus.R**.)
-</div>
+<!-- </div> -->
 <!-- <div class="solution"> -->
 <!-- **Solution:** -->
 <!-- ```{r your_own_bag, eval=FALSE} -->
