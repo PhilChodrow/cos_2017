@@ -13,11 +13,11 @@ If you have any questions loading the required software, feel free to contact Cl
 # Additional Resources
 There are many resources available online to learn more about machine learning and R.  Here are a few:
 
-- [R for Data Science](http://r4ds.had.co.nz/), an online book on modeling via R?s `tidyverse` package.
-- Online courses, including [Johns Hopkins? data science course](https://www.coursera.org/specializations/jhu-data-science) on [Coursera](https://www.coursera.org/)
+- [R for Data Science](http://r4ds.had.co.nz/), an online book on modeling via R's `tidyverse` package.
+- Online courses, including [Johns Hopkins' data science course](https://www.coursera.org/specializations/jhu-data-science) on [Coursera](https://www.coursera.org/)
 - MIT courses, including
-..* 15.071 (?The Analytics Edge?, an application and coding-based analytics course),
-..* 6.867 (EECS?s introductory Machine Learning course)
+..* 15.071 ("The Analytics Edge", an application and coding-based analytics course),
+..* 6.867 (EECS's introductory Machine Learning course)
 ..* 9.520 (A theory course about regularized machine learning methods) 
 - R packages `modelr` and `caret`
 - [Data Camp](https://www.datacamp.com/)
