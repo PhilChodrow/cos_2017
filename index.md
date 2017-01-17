@@ -36,8 +36,18 @@ Sessions 2-4 all use a data set of Boston AirBnB rentals, provided courtesy of [
 *Focuses on....*
 
 ## 4. Advanced Topics in Data Science -- [*Phil Chodrow*](https://philchodrow.github.io/)
-*Focuses on....*
+Each analysis both provides answers and likely inspires new questions. This makes the data science pipeline fundamentally cyclical:
 
+<img src="https://ismayc.github.io/moderndiver-book/images/tidy1.png" alt="The Data Science Pipeline" style="width: 200px;"/>
+*Image credit: Hadley Wickham*
+
+A skilled analyst needs to be able to smoothly transition from data manipulation to visualization to modeling and back. In this session, we focus on using the `tidyverse` set of packages to smoothly navigate the Cycle of Data Science. Topics covered include:
+
+1. Reinforcement of Session 2 tools like `dplyr` and `tidyr`.
+2. Efficient, tidy iteration with `purrr` and `map`. 
+3. Tidy model inspection and selection with `broom`. 
+
+While learning these tools, we work a complex case study that will require multiple loops around the Cycle. 
 
 - [Slides](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.html)
 - [Notes](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html)
