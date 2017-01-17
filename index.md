@@ -38,7 +38,8 @@ Sessions 2-4 all use a data set of Boston AirBnB rentals, provided courtesy of [
 ## 4. Advanced Topics in Data Science -- [*Phil Chodrow*](https://philchodrow.github.io/)
 Each analysis both provides answers and likely inspires new questions. This makes the data science pipeline fundamentally cyclical:
 
-<img src="https://ismayc.github.io/moderndiver-book/images/tidy1.png" alt="The Data Science Pipeline" style="width: 200px;"/>
+<img src="https://ismayc.github.io/moderndiver-book/images/tidy1.png" alt="The Data Science Pipeline" style="width: 700px;"/>
+
 *Image credit: Hadley Wickham*
 
 A skilled analyst needs to be able to smoothly transition from data manipulation to visualization to modeling and back. In this session, we focus on using the `tidyverse` set of packages to smoothly navigate the Cycle of Data Science. Topics covered include:
