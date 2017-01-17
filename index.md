@@ -36,9 +36,16 @@ Sessions 2-4 all use a data set of Boston AirBnB rentals, provided courtesy of [
 
 This session introduces basic concepts of machine learning and their implementation in `R`. Topics include elementary regression; regularization and model selection; natural language processing; and model diagnostics. Throughout the session, students use data manipulation and exploration skills to visualize and evaluate models. 
 
-- Slides for [machine learning fundamentals](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Machine Learning.pdf) and [natural language processing](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Natural Language Processing.pdf)
-- Notes
-- Scripts
+### Machine Learning
+
+- [Slides](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Machine Learning.pdf)
+- [Notes](https://github.com/PhilChodrow/cos_2017/3_modeling_and_ml/S3_R_script_1.html)
+
+### Natural Language Processing
+
+- [Slides](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Natural Language Processing.pdf)
+- [Notes](cos_2017/3_modeling_and_ml/script_2_complete.html)
+
 
 
 
