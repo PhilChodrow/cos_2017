@@ -601,7 +601,7 @@ plot(perf) # ROC curve</code></pre>
 ## list()</code></pre>
 <p>As you can see, the <code>performance()</code> function in the <code>ROCR</code> package is versatile and allows you to calculate and plot a bunch of different performance metrics.</p>
 <p>In our case, this model gives an AUC of 0.7. The worst possible is 0.5 - random guessing. We’re definitely better than random here, and could likely improve by adding more predictors.</p>
-<p>We’ve covered basic logistic regression, but just as with linear regression there are many, many extensions. For example, we could add higher-order predictor terms via splines. We could also do LASSO logistic regression if we wanted to use many predictors, using the <code>glmnet</code> package.</p>
+<p>We’ve covered basic logistic regression, but just as with linear regression there are many, many extensions. For example, we could add higher-order predictor terms via splines. We could also do LASSO logistic regression if we wanted to use many predictors, using the <code>glmnet</code> package. In order to change from linear regression to logistic in the <code>glmnet()</code> or <code>cv.glmnet()</code> functions, just specify the argument <code>family = &quot;binomial&quot;</code> within the function call. When predicting, there are several options in the <code>type</code> argument that are useful depending on whether you want the probabilities or the class prediction.</p>
 </div>
 <div id="classification-trees" class="section level3">
 <h3>Classification Trees</h3>
