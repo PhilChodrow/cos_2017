@@ -61,7 +61,11 @@ Data science is rarely cut-and-dried; each analysis typically provides answers b
 
 *Image credit: Hadley Wickham*
 
-A skilled analyst needs to be able to smoothly transition from data manipulation to visualization to modeling and back. In this session, we focus on using the `tidyverse` set of packages to smoothly navigate the Cycle of Data Science. Topics covered include:
+A skilled analyst needs to be able to smoothly transition from data manipulation to visualization to modeling and back. In this session, we focus on using the `tidyverse` set of packages to smoothly navigate the Cycle of Data Science. 
+
+### Learning Objectives 
+
+Topics covered include:
 
 1. Reinforcement of Session 2 tools like `dplyr` and `tidyr`.
 2. Efficient, tidy iteration with `purrr` and `map`. 
