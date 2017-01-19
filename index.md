@@ -36,16 +36,20 @@ Sessions 2-4 all use a data set of Boston AirBnB rentals, provided courtesy of [
 
 This session introduces basic concepts of machine learning and their implementation in `R`. Topics include elementary regression; regularization and model selection; natural language processing; and model diagnostics. Throughout the session, students use data manipulation and exploration skills to visualize and evaluate models. 
 
-### Machine Learning
+### Presentation Materials
 
-- [Slides](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Machine Learning.pdf)
-- [Notes](https://github.com/PhilChodrow/cos_2017/3_modeling_and_ml/S3_R_script_1.html)
-- [Exercises](cos_2017/3_modeling_and_ml/S3_Exercises_1.R) and [solutions](cos_2017/3_modeling_and_ml/S3_Exercises_1_solved.R).
+- **Slides:** [Machine Learning](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Machine Learning.pdf)
+and [Natural Language Processing](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Natural Language Processing.pdf)
+- **Notes:** [Part 1 - Regression and Splines](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/S3_R_script_1.html) and
+[Part 2 - Bag-of-Words, CART, and Clustering](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/script_2_complete.html)
 
-### Natural Language Processing
+### R Code
 
-- [Slides](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/Natural Language Processing.pdf)
-- [Notes](cos_2017/3_modeling_and_ml/script_2_complete.html)
+- **Part 1:** Script for [in-class](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/S3_R_script_1.R)
+ and [with code filled-in](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/S3_R_script_1_full.R), and [clean_amenities.R](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/clean_amenities.R)
+- [Exercises](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/S3_Exercises_1.R) and [solutions](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/S3_Exercises_1_solved.R) for Part 1
+- **Part 2:** Script for [in-class](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/script_2_inclass.R) and [with code filled-in](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/script_2_complete.R)
+- [**Bonus code**](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/bonus.R) with more machine learning examples on random forest and SVM.  
 
 ## 4. Advanced Topics in Data Science -- [*Phil Chodrow*](https://philchodrow.github.io/)
 Data science is rarely cut-and-dried; each analysis typically provides answers but also raises new questions. This makes the data scientific process fundamentally cyclical:
@@ -62,8 +66,8 @@ A skilled analyst needs to be able to smoothly transition from data manipulation
 
 While learning these tools, we work a complex case study that will require multiple iterations of manipulation, visualization, and modeling to test a data scientific hypothesis. 
 
-- [Slides](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.html)
-- [Notes](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html)
+- **Slides**: [Presentation](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.Rmd) and [source](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.html).
+- **Case Study**: [Student script](cos_2017/4_advanced_topics/case_study_student.R) for the session, [complete script](cos_2017/4_advanced_topics/case_study_complete.R) for reference, and readable [writeup](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html) with [source](https://github.com/PhilChodrow/cos_2017/blob/master/4_advanced_topics/notes.Rmd). 
 
 ## 5. Introduction to Julia and JuMP, Linear Optimization, and Engaging -- *Sebastien Martin and Joey Huchette*
 *Focuses on....*
