@@ -54,9 +54,9 @@ julia> Pkg.add("JuMP")
 Let's try a simple LP! Enter the following JuMP code in Julia and submit all the output to Stellar.
 
 ```jl
-using JuMP
+using JuMP, Gurobi
 
-m = Model(GurobiSolver()) # replace this line by "m = Model()"" if Gurobi does not work
+m = Model(solver=GurobiSolver()) # replace this line by "m = Model()"" if Gurobi does not work
 @variable(m, 0 <= x <= 2 )
 @variable(m, 0 <= y <= 30 )
 
