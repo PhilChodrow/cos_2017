@@ -52,6 +52,9 @@ and [Natural Language Processing](https://philchodrow.github.io/cos_2017/3_model
 - [**Bonus code**](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/bonus.R) with more machine learning examples on random forest and SVM.  
 
 ## 4. Advanced Topics in Data Science -- [*Phil Chodrow*](https://philchodrow.github.io/)
+
+### Motivation
+
 Data science is rarely cut-and-dried; each analysis typically provides answers but also raises new questions. This makes the data scientific process fundamentally cyclical:
 
 <img src="https://ismayc.github.io/moderndiver-book/images/tidy1.png" alt="The Data Science Pipeline" style="width: 500px;"/>
@@ -66,7 +69,9 @@ A skilled analyst needs to be able to smoothly transition from data manipulation
 
 While learning these tools, we work a complex case study that will require multiple iterations of manipulation, visualization, and modeling to test a data scientific hypothesis. 
 
-- **Slides**: [Presentation](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.Rmd) and [source](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.html).
+### Materials
+
+- **Slides**: [Presentation](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.html) and [source](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.Rmd).
 - **Case Study**: [Student script](cos_2017/4_advanced_topics/case_study_student.R) for the session, [complete script](cos_2017/4_advanced_topics/case_study_complete.R) for reference, and readable [writeup](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html) with [source](https://github.com/PhilChodrow/cos_2017/blob/master/4_advanced_topics/notes.Rmd). 
 
 ## 5. Introduction to Julia and JuMP, Linear Optimization, and Engaging -- *Sebastien Martin and Joey Huchette*
