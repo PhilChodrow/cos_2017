@@ -14,6 +14,7 @@
 library(tidyverse) # includes dplyr, tidyr, ggplot2, purrr
 library(broom)     # for retrieving model predictions
 library(lubridate) # for manipulating dates and times
+library(ggmap)
 
 # Load data ---------------------------------------------------------------
 # You may need to manually set your working directory before running the 
@@ -233,6 +234,7 @@ prices_matrix <- prices_to_cluster %>%
 # cluster_models <- data_frame(k = rep(1:10, 10)) %>% 
 # 	mutate(kclust = map(k, ~ kmeans(prices_for_clustering, .)))
 
+set.seed(1234)
 my_kmeans <- function(k){
 	kmeans(prices_matrix, k)
 }
@@ -261,7 +263,7 @@ cluster_performance %>%
 	group_by(k) %>%
 	summarise(withinss = mean(tot.withinss)) %>%
 	ggplot() + 
-	aes(x = k, y = tot.withinss) +
+	aes(x = k, y = withinss) +
 	geom_point() 
 
 # We really only need one cluster, so let's extract the first one with our 
@@ -272,7 +274,7 @@ chosen_model <- cluster_models$kclust[cluster_models$k == 2][[1]]
 # Let's inspect the clustered series. To do this, we need to add the 
 # predictions to prices_for_clustering and use gather: 
 
-prices_clustered <- prices_for_clustering %>% 
+prices_clustered <- prices_to_cluster %>% 
 	mutate(cluster = chosen_model$cluster) %>% 
 	gather(key = date, value = price, -cluster, -listing_id) %>% 
 	mutate(date = as.Date(date))
@@ -297,7 +299,7 @@ locations_to_plot <- listings %>%
 
 # Let's pull down a map...
 
-m <- ggmap::get_map('Copley Square', zoom = 14)
+m <- get_map('Copley Square', zoom = 14)
 
 # ...and plot the results
 

@@ -14,6 +14,7 @@
 library(tidyverse) # includes dplyr, tidyr, ggplot2, purrr
 library(broom)     # for retrieving model predictions
 library(lubridate) # for manipulating dates and times
+library(ggmap)     # for maps
 
 # Load data ---------------------------------------------------------------
 # You may need to manually set your working directory before running the 

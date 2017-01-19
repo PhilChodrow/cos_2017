@@ -1,5 +1,5 @@
 ---
-title: "Session 4: Advanced Topics in Data Science"
+title: "Advanced Topics in Data Science"
 subtitle: "Computing in Optimization and Statistics, 2017"
 author: "Phil Chodrow"
 date: "January 19th, 2017"
@@ -14,6 +14,15 @@ library(knitr)
 ```
 
 # Hello
+
+## Announcement: We Are Moving
+
+- Session 5, 1/24: **E62-223**
+- Session 6, 1/26: **E51-325**
+- Session 7, 1/31: **E62-223**
+- Session 8, 2/2:  **E51-325**
+
+# Advanced Topics in Data Science
 
 ## Session Titles
 
@@ -203,6 +212,14 @@ But....
 knitr::include_graphics('https://ismayc.github.io/moderndiver-book/images/tidy1.png')
 ```
 
+## Exercise 0
+
+1. Look left
+2. Look right
+3. Pick a partner (groups of three are fine)
+
+You are going to need them soon. 
+
 # Case Study, Part 1
 
 1. *Explore the data*
@@ -225,9 +242,11 @@ knitr::include_graphics('figs/journey_1.png')
 We'd like to fit a LOESS smoother to the data to capture long-term trend. We can fit a single one like this: 
 
 ```{r}
-model_data <- prices %>% 
-	filter(listing_id == 5506)
+model_data <- prices %>%       # extract a single listing's 
+	filter(listing_id == 5506) # worth of data
 
+# fit a loess model, the span is a hyperparameter, a bit 
+# like lambda in LASSO
 single_model <-  loess(price_per ~ as.numeric(date),  
 					   data = model_data, 
 					   span = .5)
@@ -251,25 +270,27 @@ model_preds %>% head()
 ```{r, fig.height = 4}
 model_preds %>%
 	ggplot(aes(x = date)) + 
-	geom_line(aes(y = .fitted), color = 'red') + 
-	geom_line(aes(y = price_per))
+	geom_line(aes(y = price_per)) + 
+	geom_line(aes(y = .fitted), color = 'red')
 ```
 
 ## How do we do this for multiple models? 
 
 ```{r, eval = FALSE}
+model_container <- ????
 for(id in unique(prices$listing_id)){
 	model <- prices %>% 
 		filter(listing_id == id) %>% 
 		loess(price_per ~ as.numeric(date),
 			  data = .,
 			  span = .25)
+	
+	model_container %>% update(model) # ?????
 	.
 	.
 	.
 }
 ```
-
 
 ## For loops...
 
@@ -277,25 +298,17 @@ for(id in unique(prices$listing_id)){
 knitr::include_graphics('figs/picard_disappointed.jpg')
 ```
 
-
-## The trick: lists
-
-```{r}
-my_list <- list('Computing', 'in', 'Optimization', 'and' ,'Statistics')
-```
-
 ## A familiar loop
-
 
 ```{r}
 my_list <- list('Computing', 'in', 'Optimization', 'and' ,'Statistics')
 
 ###<b>
-length_list = list()
-i = 1
+length_list <- list()
+i           <- 1
 for(word in my_list){
 	length_list[i] <- nchar(word)
-	i <- i + 1
+	i              <- i + 1
 }
 ###</b>
 
@@ -316,24 +329,59 @@ length_list %>% unlist() # just for display
 
 `purrr::map()` applies a function (`nchar`) to each entry of the original list. 
 
-## Why Lists? 
+## Exercise {.build}
 
-**Data frames are the fundamental unit of data science**. Their columns come in one of two types: 
+The directory `exercise_data` contains price data for each month. Use `map` to read it in efficiently, and `reduce(rbind)` to combine it all together. Use `list.files('exercise_data', full.names = T)` to get a list of all the files. 
 
-- **Atomic vectors** are vectors of integers, doubles, characters, logical, etc.
-- **List columns:** are lists, **and can hold anything.**
+```{r}
+list.files('exercise_data', full.names = T) %>% 
+	map(read_csv) %>% 
+	reduce(rbind) %>%
+	head() # just for display
+```
 
-## Well if you love lists and data frames so much... {.smaller}
+## Fundamental Pattern
+
+**Use lists of data frames (and data frames of lists) to organize your work.**
+
+
+## Why?
+
+**Data frames are the fundamental unit of data science**. 
+
+Usually their columns are **atomic vectors** of integers, doubles, dates, characters, or booleans. E.g. 
+
+```{r, echo = FALSE}
+head(prices)
+```
+
+But this is somewhat inflexible. What about more complex objects? Lists can hold anything...
+
+## Well if lists are so great...
 
 ```{r, echo = FALSE, out.height=400, out.width = 650}
+knitr::include_graphics('figs/list_df.jpg')
+```
+
+## That's a good idea! 
+
+```{r}
+prices_nested <- prices %>% 
+	tidyr::nest(-listing_id)
+
+# view the data types of the columns
+map(prices_nested, class) %>% unlist()
+```
+
+## Ew. 
+
+```{r, echo = FALSE, out.height=400, out.width = 450}
 knitr::include_graphics('figs/df_list.jpg')
 ```
 
-## Don't mind if we do
+## Actually...
 
 ```{r}
-prices_nested <- prices %>%
-	tidyr::nest(-listing_id)
 prices_nested %>% head()
 ```
 
@@ -366,7 +414,9 @@ knitr::include_graphics('figs/journey_2.png')
 Use `map` to extract a list of lengths of each data frame in `prices_nested$data`
 
 ```{r, eval = FALSE}
+### <b> 
 lengths <- map(prices_nested$data, nrow)
+### </b>
 lengths %>% unlist() %>% head() # for display only
 ```
 
@@ -376,7 +426,7 @@ map(prices_nested$data, nrow) %>% unlist() %>% head()
 
 ## Exercise {.build}
 
-Here's a function that extracts the largest price from a data frame:
+Write a function that extracts the largest price (per person) from a data frame. 
 
 ```{r}
 get_biggest_price <- function(data){
@@ -384,11 +434,13 @@ get_biggest_price <- function(data){
 }
 ```
 
-Use `map` to extract the largest price in each data frame: 
+Now `map` to extract the largest price in each data frame in `prices_nested$data`: 
 
 ```{r}
+### <b> 
 biggest_prices <- map(prices_nested$data, get_biggest_price)
-biggest_prices %>% head()
+### </b>
+biggest_prices %>% head() %>% unlist()
 ```
 
 ## Exercise {.build}
@@ -403,6 +455,25 @@ prices_nested %>%
 ```{r, echo = FALSE}
 prices_nested %>%
 	mutate(highest_price = map(data, get_biggest_price)) %>% 
+	head(5)
+```
+
+## Exercise
+
+Now do the same thing, but assign the result to a *new list column* of `prices_nested`. Don't forget what you learned in Session 2! 
+ 
+```{r, eval = FALSE}
+prices_nested %>% 
+	### <b> 
+	mutate(highest_price = map_dbl(data, get_biggest_price))
+	### </b>
+```
+
+```{r, echo = FALSE}
+prices_nested %>%
+	
+	mutate(highest_price = map_dbl(data, get_biggest_price)) %>% 
+	
 	head(5)
 ```
 
