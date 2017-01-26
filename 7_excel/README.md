@@ -1,11 +1,11 @@
 
-**Session 3:** Microsof Excel
+## **Microsof Excel**
 
 **Instructor:** Charles Thraves, cthraves@mit.edu
 
 **Date/time:** Tuesday January 31st, 9:00 AM - 12:00 PM
 
-**Classroom:** E62-250
+**Classroom:** E51-151
 
 ## **Course Objectives**
 Introduce and practice with concrete real life examples on how to use the most important functions and shortcuts in Excel. The goal is to enable students to face a wide variety of problems in an efficient way in Excel. In each session the students will be given a problem with a series of tasks to accomplish. These tasks will be solved using different Excel functionalities. Most of these problems have been based on real company spreadsheet problems.
@@ -31,5 +31,3 @@ This course is open to all students with any level of background: from beginners
 -	User defined formulas
 -	Macros
 
-## **About the instructor:**
-Charles is a 5th year PhD in Operations Research Center at MIT. Through the last 10 years, he has taught Excel classes to audiences from undergraduates, MBA, EMBA, PhD, and executives from the industry. The set of topics covered for each of these audiences varies according to the different needs they have.
