@@ -2,7 +2,7 @@
 ## **Microsof Excel**
 **Instructor:** Charles Thraves, cthraves@mit.edu  <br />
 **Date/time:** Tuesday January 31st, 9:00 AM - 12:00 PM  <br />
-**Classroom:** E51-151 <br />
+**Classroom:** E62-223 <br />
 
 ## Pre-Assignment <br /> 
 * Download all the files uploaded. Every excel file has a solution file included. For example, the file **KeyMatrices.xlsx** is the solution of the file **Matrices.xlsx**. The file **Shortcuts and Easy Guide.pdf** shows some of the most important shortcuts we will use during the session, and a summary on how to access some of the things we will do in the session. <br />
