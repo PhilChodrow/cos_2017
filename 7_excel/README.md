@@ -3,7 +3,7 @@
 
 **Instructor:** Charles Thraves, cthraves@mit.edu
 
-**Date/time:** Thursday January 26th, 1:00 PM - 4:00 PM
+**Date/time:** Tuesday January 31st, 9:00 AM - 12:00 PM
 
 **Classroom:** E62-250
 
