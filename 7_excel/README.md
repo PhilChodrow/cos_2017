@@ -1,11 +1,14 @@
 
 ## **Microsof Excel**
+**Instructor:** Charles Thraves, cthraves@mit.edu  <br />
+**Date/time:** Tuesday January 31st, 9:00 AM - 12:00 PM  <br />
+**Classroom:** E51-151 <br />
 
-**Instructor:** Charles Thraves, cthraves@mit.edu
-
-**Date/time:** Tuesday January 31st, 9:00 AM - 12:00 PM
-
-**Classroom:** E51-151
+## Pre-Assignment <br /> 
+* Download all the files uploaded. Every file has a solution file included. For example, the file **KeyMatrices.xlsx** is the solution of the file **Matrices.xlsx**. <br />
+* Every file has a solution file included. For example, the file **KeyMatrices.xlsx** is the solution of the file **Matrices.xlsx**. <br />
+* The file **Shortcuts and Easy Guide.pdf** shows some of the most important shortcuts we will use during the session, and a summary on how to access some of the things we will do in the session. <br />
+* Install **Microsoft Excel** in your computer. <br />
 
 ## **Course Objectives**
 Introduce and practice with concrete real life examples on how to use the most important functions and shortcuts in Excel. The goal is to enable students to face a wide variety of problems in an efficient way in Excel. In each session the students will be given a problem with a series of tasks to accomplish. These tasks will be solved using different Excel functionalities. Most of these problems have been based on real company spreadsheet problems.
@@ -30,4 +33,7 @@ This course is open to all students with any level of background: from beginners
 -	Sheet protection
 -	User defined formulas
 -	Macros
+
+## Questions <br />
+If you have any questions or need help, email Charles Thraves at cthraves@mit.edu.
 
