@@ -5,9 +5,7 @@
 **Classroom:** E51-151 <br />
 
 ## Pre-Assignment <br /> 
-* Download all the files uploaded. Every file has a solution file included. For example, the file **KeyMatrices.xlsx** is the solution of the file **Matrices.xlsx**. <br />
-* Every file has a solution file included. For example, the file **KeyMatrices.xlsx** is the solution of the file **Matrices.xlsx**. <br />
-* The file **Shortcuts and Easy Guide.pdf** shows some of the most important shortcuts we will use during the session, and a summary on how to access some of the things we will do in the session. <br />
+* Download all the files uploaded. Every excel file has a solution file included. For example, the file **KeyMatrices.xlsx** is the solution of the file **Matrices.xlsx**. The file **Shortcuts and Easy Guide.pdf** shows some of the most important shortcuts we will use during the session, and a summary on how to access some of the things we will do in the session. <br />
 * Install **Microsoft Excel** in your computer. <br />
 
 ## **Course Objectives**
