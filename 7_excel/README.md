@@ -32,6 +32,3 @@ This course is open to all students with any level of background: from beginners
 -	User defined formulas
 -	Macros
 
-## Questions <br />
-If you have any questions or need help, email Charles Thraves at cthraves@mit.edu.
-
