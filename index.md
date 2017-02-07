@@ -52,13 +52,20 @@ and [Natural Language Processing](https://philchodrow.github.io/cos_2017/3_model
 - [**Bonus code**](https://philchodrow.github.io/cos_2017/3_modeling_and_ml/bonus.R) with more machine learning examples on random forest and SVM.  
 
 ## 4. Advanced Topics in Data Science -- [*Phil Chodrow*](https://philchodrow.github.io/)
+
+### Motivation
+
 Data science is rarely cut-and-dried; each analysis typically provides answers but also raises new questions. This makes the data scientific process fundamentally cyclical:
 
 <img src="https://ismayc.github.io/moderndiver-book/images/tidy1.png" alt="The Data Science Pipeline" style="width: 500px;"/>
 
 *Image credit: Hadley Wickham*
 
-A skilled analyst needs to be able to smoothly transition from data manipulation to visualization to modeling and back. In this session, we focus on using the `tidyverse` set of packages to smoothly navigate the Cycle of Data Science. Topics covered include:
+A skilled analyst needs to be able to smoothly transition from data manipulation to visualization to modeling and back. In this session, we focus on using the `tidyverse` set of packages to smoothly navigate the Cycle of Data Science. 
+
+### Learning Objectives 
+
+Topics covered include:
 
 1. Reinforcement of Session 2 tools like `dplyr` and `tidyr`.
 2. Efficient, tidy iteration with `purrr` and `map`. 
@@ -66,11 +73,22 @@ A skilled analyst needs to be able to smoothly transition from data manipulation
 
 While learning these tools, we work a complex case study that will require multiple iterations of manipulation, visualization, and modeling to test a data scientific hypothesis. 
 
-- **Slides**: [Presentation](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.Rmd) and [source](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.html).
+### Materials
+
+- **Slides**: [Presentation](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.html) and [source](https://philchodrow.github.io/cos_2017/4_advanced_topics/slides.Rmd).
 - **Case Study**: [Student script](cos_2017/4_advanced_topics/case_study_student.R) for the session, [complete script](cos_2017/4_advanced_topics/case_study_complete.R) for reference, and readable [writeup](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html) with [source](https://github.com/PhilChodrow/cos_2017/blob/master/4_advanced_topics/notes.Rmd). 
 
 ## 5. Introduction to Julia and JuMP, Linear Optimization, and Engaging -- *Sebastien Martin and Joey Huchette*
-*Focuses on....*
+
+Introduces the Julia programming language, elementary optimization in with the JuMP module, and interacting with MIT Sloan's computing cluster, Engaging. 
+
+### Materials
+
+- **Remote Computing**: [Slides](https://github.com/PhilChodrow/cos_2017/blob/master/5_julia_and_jump/remotecomputing.pdf)
+- **Introduction to Julia and Jupyter**: [Notebook](https://github.com/PhilChodrow/cos_2017/blob/master/5_julia_and_jump/intro-julia-jupyter.ipynb)
+- **JuMP Tutorial**: [Exercises](https://github.com/PhilChodrow/cos_2017/5_julia_and_jump/JuMP tutorial.ipynb) and [solutions](https://github.com/PhilChodrow/cos_2017/5_julia_and_jump/JuMP tutorial complete.ipynb). 
+
+
 
 
 ## 6. Nonlinear and Integer Optimization in JuMP --  *Miles Lubin and Yee Sian Ng*
