@@ -79,7 +79,16 @@ While learning these tools, we work a complex case study that will require multi
 - **Case Study**: [Student script](cos_2017/4_advanced_topics/case_study_student.R) for the session, [complete script](cos_2017/4_advanced_topics/case_study_complete.R) for reference, and readable [writeup](https://philchodrow.github.io/cos_2017/4_advanced_topics/notes.html) with [source](https://github.com/PhilChodrow/cos_2017/blob/master/4_advanced_topics/notes.Rmd). 
 
 ## 5. Introduction to Julia and JuMP, Linear Optimization, and Engaging -- *Sebastien Martin and Joey Huchette*
-*Focuses on....*
+
+Introduces the Julia programming language, elementary optimization in with the JuMP module, and interacting with MIT Sloan's computing cluster, Engaging. 
+
+### Materials
+
+- **Remote Computing**: [Slides](https://github.com/PhilChodrow/cos_2017/blob/master/5_julia_and_jump/remotecomputing.pdf)
+- **Introduction to Julia and Jupyter**: [Notebook](https://github.com/PhilChodrow/cos_2017/blob/master/5_julia_and_jump/intro-julia-jupyter.ipynb)
+- **JuMP Tutorial**: [Exercises](https://github.com/PhilChodrow/cos_2017/5_julia_and_jump/JuMP tutorial.ipynb) and [solutions](https://github.com/PhilChodrow/cos_2017/5_julia_and_jump/JuMP tutorial complete.ipynb). 
+
+
 
 
 ## 6. Nonlinear and Integer Optimization in JuMP --  *Miles Lubin and Yee Sian Ng*
