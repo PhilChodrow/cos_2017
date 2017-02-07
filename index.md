@@ -84,19 +84,44 @@ Introduces the Julia programming language, elementary optimization in with the J
 
 ### Materials
 
-- **Remote Computing**: [Slides](https://github.com/PhilChodrow/cos_2017/blob/master/5_julia_and_jump/remotecomputing.pdf)
-- **Introduction to Julia and Jupyter**: [Notebook](https://github.com/PhilChodrow/cos_2017/blob/master/5_julia_and_jump/intro-julia-jupyter.ipynb)
-- **JuMP Tutorial**: [Exercises](https://github.com/PhilChodrow/cos_2017/5_julia_and_jump/JuMP tutorial.ipynb) and [solutions](https://github.com/PhilChodrow/cos_2017/5_julia_and_jump/JuMP tutorial complete.ipynb). 
-
-
+- **Remote Computing**: [Slides](https://philchodrow.github.io/cos_2017/5_julia_and_jump/remotecomputing.pdf)
+- **Introduction to Julia and Jupyter**: [Notebook](https://philchodrow.github.io/cos_2017/5_julia_and_jump/intro-julia-jupyter.ipynb)
+- **JuMP Tutorial**: [Exercises](https://philchodrow.github.io/cos_2017/5_julia_and_jump/JuMP tutorial.ipynb) and [solutions](https://philchodrow.github.io/cos_2017/5_julia_and_jump/JuMP tutorial complete.ipynb). 
 
 
 ## 6. Nonlinear and Integer Optimization in JuMP --  *Miles Lubin and Yee Sian Ng*
-*Focuses on....*
+
+A discussion of more advanced optimization techniques with Julia and JuMP, including nonlinear and mixed integer techniques. 
+
+### Materials
+
+1. **Introduction** - [Notebook](https://philchodrow.github.io/cos_2017/6_nonlinear_and_integer/1-introduction.ipynb) and [solutions](https://philchodrow.github.io/cos_2017/6_nonlinear_and_integer/1-introduction-solution.ipynb) 
+2. **Using Callbacks** - [Notebook](https://philchodrow.github.io/cos_2017/6_nonlinear_and_integer/2-callbacks.ipynb) and [solutions](https://philchodrow.github.io/cos_2017/6_nonlinear_and_integer/2-callbacks-solutions.ipynb)
+3. **Nonlinear optimization** - [Notebook](https://philchodrow.github.io/cos_2017/6_nonlinear_and_integer/3-nonlinear.ipynb)
 
 ## 7. Excel for Operations Research -- *Charlie Thraves*
-*Focuses on....*
+
+Introduces key functions in Excel, using concrete examples and case studies. Students learn to handle efficiently a wide variety of problems based on spreadsheet challenges faced by real companies. Topics include elementary formulas, reference types, matrix manipulation, pivot tables, and macros. 
+
+### Materials
+
+1. [Shortcuts and References](https://philchodrow.github.io/cos_2017/7_excel/Shortcuts and Easy Guide.pdf)
+2. [Session Workbooks](https://github.com/PhilChodrow/cos_2017/tree/master/7_excel)
 
 ## 8. Deep Learning in TensorFlow Python -- *Eli Gutin and Brad Sturt*
-*Focuses on....*
+
+Introduces TensorFlow, a state-of-the-art library from Google for working with neural networks and other deep-architecture computations. Students deploy neural networks on a series of challenging machine learning problems, with a focus on classification tasks. 
+
+### Materials
+
+1. [Obtaining TensorFlow](https://philchodrow.github.io/cos_2017/8_deep_learning/DeepLearnIAP2017Preassignment.pdf) - 
+2. [Slides](https://philchodrow.github.io/cos_2017/8_deep_learning/DeepLearnIAP2017Slides.pptx)
+3. Elementary Nonlinear Classification - [exercises](https://philchodrow.github.io/cos_2017/8_deep_learning/Project1NLClassLive.ipynb) and [solutions](https://philchodrow.github.io/cos_2017/8_deep_learning/Project1NLClassComplete.ipynb)
+4. Teaching a Computer Binary - [exercises](https://philchodrow.github.io/cos_2017/8_deep_learning/Project2ANNBinaryLive.ipynb) and [solutions](https://philchodrow.github.io/cos_2017/8_deep_learning/Project2ANNBinaryComplete.ipynb)
+5. Handwritten Digit (MNIST) Classification - [exercises](https://philchodrow.github.io/cos_2017/8_deep_learning/Project3MNISTLive.ipynb) and [solutions](https://philchodrow.github.io/cos_2017/8_deep_learning/Project3MNISTComplete.ipynb)
+
+
+
+
+
 
