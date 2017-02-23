@@ -19,7 +19,7 @@ Introduces foundational concepts and computing tools, including terminal navigat
 - [Introduction to `R`](https://philchodrow.github.io/cos_2017/1_terminal_and_git/intro.R)
 - [Sample Data Set](https://philchodrow.github.io/cos_2017/1_terminal_and_git/taxi_data.csv), courtesy of the [New York City Taxi and Limousine Commission](http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml)
 
-## 2. Data Wrangling and Visualization -- [*Steve Morse*](http://web.mit.edu/stmorse/www/)
+## 2. Data Wrangling and Visualization -- [*Steve Morse*](https://stmorse.github.io/)
 This session will introduce basic techniques in data wrangling and visualization in R.  Specifically, we will cover some basic tools using out-of-the-box R commands, then introduce the powerful framework of the "tidyverse" (both in wrangling and visualizing data), and finally gain some understanding of the philosophy of this framework to set up deeper exploration of our data.  Throughout, we will be using a publicly available dataset of AirBnB listings.
 
 Sessions 2-4 all use a data set of Boston AirBnB rentals, provided courtesy of [AirBnB and Kaggle](https://www.kaggle.com/airbnb/boston). You can download each of the three components by clicking the links below: 
