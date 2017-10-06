@@ -108,7 +108,7 @@ Introduces key functions in Excel, using concrete examples and case studies. Stu
 1. [Shortcuts and References](https://philchodrow.github.io/cos_2017/7_excel/Shortcuts and Easy Guide.pdf)
 2. [Session Workbooks](https://github.com/PhilChodrow/cos_2017/tree/master/7_excel)
 
-## 8. Deep Learning in TensorFlow Python -- *Eli Gutin and Brad Sturt*
+## 8. Deep Learning in TensorFlow Python -- *Eli Gutin*
 
 Introduces TensorFlow, a state-of-the-art library from Google for working with neural networks and other deep-architecture computations. Students deploy neural networks on a series of challenging machine learning problems, with a focus on classification tasks. 
 
